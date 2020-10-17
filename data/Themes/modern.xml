@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="utf8" ?>
 <xmoto_theme name="Modern">
 <sprite type="Texture" name="default" file="Dirt.jpg" sum="44df1a4fd3b135149648a588ff4ebd4a" />
-<sprite type="BikerPart" name="GhostBikerBody" file="GhostBikerBody.png" sum="8a7cd4b3e4620c9ca3eb1328966d9614" />
-<sprite type="BikerPart" name="GhostBikerFront" file="Front_Ghost.png" sum="bbf832018ea041740b73fc4a24fd73e9" />
-<sprite type="BikerPart" name="GhostBikerRear" file="Rear_Ghost.png" sum="ecb2f44b8eb4cbcc479c140f73f072bf" />
-<sprite type="BikerPart" name="GhostBikerWheel" file="GhostBikerWheel.png" sum="95607888fe0a52c2116828a3bc02e0b8" />
-<sprite type="BikerPart" name="GhostLowerArm" file="GhostLowerArm.png" sum="afbaba0a56e14f16b22b8fd9da2a4834" />
-<sprite type="BikerPart" name="GhostLowerLeg" file="GhostLowerLeg.png" sum="64016e128fa6ff374436e7a8220ce67d" />
-<sprite type="BikerPart" name="GhostTorso" file="GhostTorso.png" sum="e52b2273834eab22e7bae3fa2b338cb8" />
-<sprite type="BikerPart" name="GhostUpperArm" file="GhostUpperArm.png" sum="73008a8b78ef6769e2e3e2e8a87260da" />
-<sprite type="BikerPart" name="GhostUpperLeg" file="GhostUpperLeg.png" sum="e4719307131fbda50979a4a97ff1c1d5" />
 <sprite type="BikerPart" name="PlayerBikerBody" file="PlayerBikerBody.png" sum="38d87816cc1d60aca5f210edb21f2c97" />
 <sprite type="BikerPart" name="PlayerBikerFront" file="Front1.png" sum="6c4ab606fbdd36e089951f74a1dd83c5" />
 <sprite type="BikerPart" name="PlayerBikerRear" file="Rear1.png" sum="afc5b32aaf1603ad51c55f66916b63cd" />
