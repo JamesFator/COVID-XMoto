@@ -193,10 +193,6 @@
 
     Constants.fps = 60.0;
 
-    Constants.replay_key_step = 60;
-
-    Constants.replay_key_step_precision = 4;
-
     Constants.automatic_scale = true;
 
     Constants.manual_scale = true;
@@ -581,7 +577,6 @@
       this.layer_offsets = new LayerOffsets(this);
       this.script = new Script(this);
       this.entities = new Entities(this);
-      this.replay = new Replay(this);
     }
 
     Level.prototype.load_from_file = function(filename, callback) {
@@ -630,10 +625,10 @@
     };
 
     Level.prototype.update = function() {
-      var dead_player, dead_replay;
+      var dead_player;
       this.physics.update();
       dead_player = !this.moto.dead;
-      if (dead_player || dead_replay) {
+      if (dead_player) {
         this.update_timer();
       }
       this.sky.update();
@@ -695,7 +690,6 @@
     };
 
     Level.prototype.restart = function() {
-      this.replay = new Replay(this);
       this.moto.destroy();
       this.moto = new Moto(this);
       this.moto.init();
@@ -776,7 +770,7 @@
     };
 
     Listeners.prototype.trigger_restart = function(moto) {
-      this.level.replay.success = true;
+      console.log("WIN!");
       return this.level.need_to_restart = true;
     };
 
@@ -824,10 +818,8 @@
         chrono: '#chrono',
         width: 800,
         height: 600,
-        replays: [],
         zoom: Constants.default_scale.x,
-        levels_path: 'data/Levels',
-        replays_path: 'data/Replays'
+        levels_path: 'data/Levels'
       };
       options = $.extend(defaults, options);
       Constants.default_scale = {
@@ -922,12 +914,6 @@
     };
 
     Physics.prototype.restart = function() {
-      var replay, time;
-      replay = this.level.replay;
-      if (replay.success) {
-        time = (replay.steps / 60.0).toFixed(2).replace('.', ':');
-        console.log("WIN! You finished in " + time + " (" + replay.steps + " steps)");
-      }
       this.level.restart();
       return this.init();
     };
@@ -939,7 +925,6 @@
         this.steps = this.steps + 1;
         this.last_step += this.step;
         this.level.moto.move();
-        this.level.replay.add_step();
         this.level.camera.move();
         this.world.Step(1.0 / Constants.fps, 10, 10);
         this.world.ClearForces();
@@ -2445,7 +2430,7 @@
   })();
 
   Particles = (function() {
-    function Particles(level, replay) {
+    function Particles(level) {
       this.level = level;
       this.physics = level.physics;
       this.world = this.physics.world;
@@ -2496,172 +2481,6 @@
     };
 
     return Particles;
-
-  })();
-
-  Replay = (function() {
-    function Replay(level) {
-      this.level = level;
-      this.success = false;
-      this.steps = 0;
-      this.inputs = {
-        up_down: [],
-        up_up: [],
-        down_down: [],
-        down_up: [],
-        left_down: [],
-        left_up: [],
-        right_down: [],
-        right_up: [],
-        space_pressed: []
-      };
-      this.key_steps = {};
-    }
-
-    Replay.prototype.clone = function() {
-      var j, k, key, len, len1, new_replay, part, ref, ref1, ref2, value;
-      new_replay = new Replay(this.level);
-      new_replay.success = this.success;
-      new_replay.steps = this.steps;
-      ref = ['up_down', 'up_up', 'down_down', 'down_up', 'left_down', 'left_up', 'right_down', 'right_up', 'space_pressed'];
-      for (j = 0, len = ref.length; j < len; j++) {
-        key = ref[j];
-        new_replay.inputs[key] = this.inputs[key].slice();
-      }
-      ref1 = this.key_steps;
-      for (key in ref1) {
-        value = ref1[key];
-        new_replay.key_steps[key] = {};
-        ref2 = ['body', 'left_wheel', 'right_wheel', 'left_axle', 'right_axle', 'torso', 'upper_leg', 'lower_leg', 'upper_arm', 'lower_arm'];
-        for (k = 0, len1 = ref2.length; k < len1; k++) {
-          part = ref2[k];
-          new_replay.key_steps[key][part] = {
-            position: {
-              x: value[part].position.x,
-              y: value[part].position.y
-            },
-            angle: value[part].angle,
-            linear_velocity: {
-              x: value[part].linear_velocity.x,
-              y: value[part].linear_velocity.y
-            },
-            angular_velocity: value[part].angular_velocity
-          };
-        }
-      }
-      return new_replay;
-    };
-
-    Replay.prototype.add_step = function() {
-      this.steps = this.level.physics.steps;
-      this.add_inputs();
-      return this.add_key_steps();
-    };
-
-    Replay.prototype.add_inputs = function() {
-      var input, j, key, len, ref;
-      input = this.level.input;
-      ref = ['up', 'down', 'left', 'right'];
-      for (j = 0, len = ref.length; j < len; j++) {
-        key = ref[j];
-        if (input[key] && this.is_up(key)) {
-          this.inputs[key + "_down"].push(this.steps);
-        } else if (!input[key] && this.is_down(key)) {
-          this.inputs[key + "_up"].push(this.steps);
-        }
-      }
-      if (input.space) {
-        return this.inputs['space_pressed'].push(this.steps);
-      }
-    };
-
-    Replay.prototype.add_key_steps = function() {
-      var j, k, key_step, len, len1, moto, part, ref, ref1, results, rider;
-      moto = this.level.moto;
-      rider = moto.rider;
-      if (this.steps % Constants.replay_key_step === 0) {
-        key_step = this.key_steps[this.steps.toString()] = {};
-        ref = ['body', 'left_wheel', 'right_wheel', 'left_axle', 'right_axle'];
-        for (j = 0, len = ref.length; j < len; j++) {
-          part = ref[j];
-          key_step[part] = this.physics_values(moto[part]);
-        }
-        ref1 = ['torso', 'upper_leg', 'lower_leg', 'upper_arm', 'lower_arm'];
-        results = [];
-        for (k = 0, len1 = ref1.length; k < len1; k++) {
-          part = ref1[k];
-          results.push(key_step[part] = this.physics_values(rider[part]));
-        }
-        return results;
-      }
-    };
-
-    Replay.prototype.last = function(input) {
-      var element, i, input_length, j, last_element, len, ref, steps;
-      last_element = null;
-      input_length = this.inputs[input].length;
-      steps = this.level.physics.steps;
-      ref = this.inputs[input];
-      for (i = j = 0, len = ref.length; j < len; i = ++j) {
-        element = ref[i];
-        if (element <= steps && (i + 1 > input_length - 1 || this.inputs[input][i + 1] > steps)) {
-          last_element = element;
-          break;
-        }
-      }
-      return last_element;
-    };
-
-    Replay.prototype.is_up = function(key) {
-      return this.last(key + "_up") >= this.last(key + "_down");
-    };
-
-    Replay.prototype.is_down = function(key) {
-      return this.last(key + "_down") >= this.last(key + "_up");
-    };
-
-    Replay.prototype.is_pressed = function(key) {
-      return this.last(key + "_pressed") === this.level.physics.steps;
-    };
-
-    Replay.prototype.load = function(data) {
-      var splitted;
-      splitted = data.split("\n");
-      this.inputs = ReplayConversionService.string_to_inputs(splitted[0]);
-      this.key_steps = ReplayConversionService.string_to_key_steps(splitted[1]);
-      this.success = true;
-      return this;
-    };
-
-    Replay.prototype.save = function() {
-      var inputs_string, key_steps_string, replay_string;
-      inputs_string = ReplayConversionService.inputs_to_string(this.inputs);
-      key_steps_string = ReplayConversionService.key_steps_to_string(this.key_steps);
-      replay_string = inputs_string + "\n" + key_steps_string;
-      return $.post(this.level.options.scores_path, {
-        level: this.level.infos.identifier,
-        time: this.level.current_time,
-        steps: this.steps,
-        replay: replay_string
-      });
-    };
-
-    Replay.prototype.physics_values = function(object) {
-      return {
-        position: {
-          x: object.GetPosition().x,
-          y: object.GetPosition().y
-        },
-        angle: object.GetAngle(),
-        linear_velocity: {
-          x: object.GetLinearVelocity().x,
-          y: object.GetLinearVelocity().y
-        },
-        angular_velocity: object.GetAngularVelocity()
-      };
-    };
-
-    return Replay;
 
   })();
 
@@ -3017,118 +2836,6 @@
     };
 
     return MotoFlipService;
-
-  })();
-
-  ReplayConversionService = (function() {
-    function ReplayConversionService() {}
-
-    ReplayConversionService.inputs_to_string = function(inputs) {
-      var j, k, key, len, len1, ref, ref1, step, string;
-      string = '';
-      ref = ['up_down', 'up_up', 'down_down', 'down_up', 'left_down', 'left_up', 'right_down', 'right_up', 'space_pressed'];
-      for (j = 0, len = ref.length; j < len; j++) {
-        key = ref[j];
-        string += key + ":";
-        ref1 = inputs[key];
-        for (k = 0, len1 = ref1.length; k < len1; k++) {
-          step = ref1[k];
-          string += step + ",";
-        }
-        if (string[string.length - 1] === ',') {
-          string = string.slice(0, -1);
-        }
-        string += '|';
-      }
-      string = string.slice(0, -1);
-      return LZString.compressToBase64(string);
-    };
-
-    ReplayConversionService.string_to_inputs = function(string) {
-      var i, inputs, j, k, key, keys, len, len1, name, splitted, step, values;
-      inputs = {};
-      string = LZString.decompressFromBase64(string);
-      keys = string.split('|');
-      for (j = 0, len = keys.length; j < len; j++) {
-        key = keys[j];
-        splitted = key.split(':');
-        name = splitted[0];
-        values = splitted[1].split(',');
-        inputs[name] = [];
-        if (values[0] !== '') {
-          for (i = k = 0, len1 = values.length; k < len1; i = ++k) {
-            step = values[i];
-            inputs[name][i] = parseInt(step);
-          }
-        }
-      }
-      return inputs;
-    };
-
-    ReplayConversionService.key_steps_to_string = function(key_steps) {
-      var a, b, c, d, e, f, j, key, key_step, len, ref, step, string;
-      string = Constants.replay_key_step + "@";
-      for (step in key_steps) {
-        key_step = key_steps[step];
-        ref = ['body', 'left_wheel', 'right_wheel', 'left_axle', 'right_axle', 'torso', 'upper_leg', 'lower_leg', 'upper_arm', 'lower_arm'];
-        for (j = 0, len = ref.length; j < len; j++) {
-          key = ref[j];
-          a = key_step[key].position.x.toFixed(Constants.replay_key_step_precision);
-          b = key_step[key].position.y.toFixed(Constants.replay_key_step_precision);
-          c = key_step[key].angle.toFixed(Constants.replay_key_step_precision);
-          d = key_step[key].linear_velocity.x.toFixed(Constants.replay_key_step_precision);
-          e = key_step[key].linear_velocity.y.toFixed(Constants.replay_key_step_precision);
-          f = key_step[key].angular_velocity.toFixed(Constants.replay_key_step_precision);
-          string += a + "," + b + "," + c + "," + d + "," + e + "," + f + "|";
-        }
-        string = string.slice(0, -1);
-        string += '=';
-      }
-      if (string[string.length - 1] === '=') {
-        string = string.slice(0, -1);
-      }
-      return LZString.compressToBase64(string);
-    };
-
-    ReplayConversionService.string_to_key_steps = function(string) {
-      var current_interval, element, i, j, k, key_step, key_step_string, key_steps, key_steps_string, len, len1, part_string, ref, ref1, step_interval, value_string;
-      key_steps = {};
-      string = LZString.decompressFromBase64(string);
-      key_steps_string = string.split('@')[1];
-      step_interval = parseInt(string.split('@')[0]);
-      current_interval = step_interval;
-      if (key_steps_string.indexOf("=") === -1) {
-        return key_steps;
-      }
-      ref = key_steps_string.split('=');
-      for (j = 0, len = ref.length; j < len; j++) {
-        key_step_string = ref[j];
-        key_step = {};
-        part_string = key_step_string.split('|');
-        ref1 = ['body', 'left_wheel', 'right_wheel', 'left_axle', 'right_axle', 'torso', 'upper_leg', 'lower_leg', 'upper_arm', 'lower_arm'];
-        for (i = k = 0, len1 = ref1.length; k < len1; i = ++k) {
-          element = ref1[i];
-          value_string = part_string[i].split(',');
-          key_step[element] = {
-            position: {
-              x: parseFloat(value_string[0]),
-              y: parseFloat(value_string[1])
-            },
-            angle: parseFloat(value_string[2]),
-            linear_velocity: {
-              x: parseFloat(value_string[3]),
-              y: parseFloat(value_string[4])
-            },
-            angular_velocity: parseFloat(value_string[5])
-          };
-        }
-        key_steps[current_interval] = key_step;
-        current_interval += step_interval;
-      }
-      return key_steps;
-    };
-
-    return ReplayConversionService;
 
   })();
 
