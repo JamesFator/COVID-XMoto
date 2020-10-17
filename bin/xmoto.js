@@ -797,7 +797,7 @@
   })();
 
   $.xmoto = function(level_filename, options) {
-    var bind_render_to_dom, bind_stats_fps, bind_stats_ms, initialize, load_options, main_loop;
+    var bind_render_to_dom, initialize, load_options, main_loop;
     if (options == null) {
       options = {};
     }
@@ -844,30 +844,8 @@
       $('#xmoto').append('<canvas id="xmoto-debug" width="' + options.width + '" height="' + options.height + '"></canvas>');
       return $('#xmoto-debug').hide();
     };
-    bind_stats_fps = function() {
-      var stats;
-      stats = new Stats();
-      stats.showPanel(0);
-      $('#xmoto')[0].appendChild(stats.dom);
-      $('#xmoto div:last').addClass('stats-fps');
-      return stats;
-    };
-    bind_stats_ms = function() {
-      var stats;
-      stats = new Stats();
-      stats.showPanel(1);
-      $('#xmoto')[0].appendChild(stats.dom);
-      $('#xmoto div:last').addClass('stats-ms');
-      return stats;
-    };
     main_loop = function(level_filename, renderer, options) {
-      var level, stats_fps, stats_ms;
-      if (Constants.debug) {
-        stats_fps = bind_stats_fps();
-      }
-      if (Constants.debug) {
-        stats_ms = bind_stats_ms();
-      }
+      var level;
       level = new Level(renderer, options);
       return level.load_from_file(level_filename, (function(_this) {
         return function() {
@@ -875,23 +853,11 @@
           level.init(renderer);
           $(options.loading).hide();
           update = function() {
-            if (Constants.debug) {
-              stats_fps.begin();
-            }
-            if (Constants.debug) {
-              stats_ms.begin();
-            }
             level.update();
             if (!Constants.debug_physics) {
               renderer.render(level.stage);
             }
             window.game_loop = requestAnimationFrame(update);
-            if (Constants.debug) {
-              stats_fps.end();
-            }
-            if (Constants.debug) {
-              return stats_ms.end();
-            }
           };
           return update();
         };
