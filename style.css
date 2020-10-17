@@ -1,35 +1,6 @@
 body {
-  background: url('/background.png');
   margin: 0px;
   padding-bottom: 40px;
-  /* overflow: hidden; */
-}
-
-.back {
-  text-align: left;
-  font-size: 14px;
-  padding-left: 7px;
-  margin-top: 5px;
-}
-
-.back a {
-  color: #08c;
-  text-decoration: none;
-  font-size: 14px;
-  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-  line-height: 34px;
-}
-
-.back a:hover {
-  color: black;
-}
-
-.github-banner {
-  position: absolute;
-  top: 0;
-  right: 0;
-  border: 0;
-  z-index: 1;
 }
 
 #content {
@@ -46,43 +17,10 @@ body {
   box-shadow: 0px 0px 30px #888;
 }
 
-.stats-fps {
-  position: absolute !important;
-  right: 200px !important;
-  left: inherit !important;
-  top: -48px !important;
-}
-
-.stats-ms {
-  position: absolute !important;
-  left: inherit !important;
-  right: 120px !important;
-  top: -48px !important;
-}
-
-#prev-level, #next-level {
-  box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  width:100px;
-  height:600px;
-  padding-top: 234px;
-  float:left;
-  cursor:pointer;
-  color:#E5E5E5;
-  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-  display:block;
-  font-size: 80px;
-  text-align: center;
-}
-
-#prev-level:hover, #next-level:hover {
-  color:#999999;
-}
 
 #loading {
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
   font-size: 19px;
-  margin-left: 100px;
   position: absolute;
   top: 234px;
   width: 1000px;
@@ -97,7 +35,7 @@ body {
 #chrono {
   position: absolute;
   top: 18px;
-  left: 995px;
+  left: 900px;
   font-size: 20px;
   background-color: black;
   color: white;
@@ -109,187 +47,12 @@ body {
   padding-bottom: 8px;
 }
 
-#levels_block {
-  width: 1000px;
-  float: left;
-  padding-top: 7px;
-  margin-left: 100px;
-
-  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-  font-size: 19px;
-  color: #333;
-}
-
-#levels_block select {
-  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-  font-size: 19px;
-  vertical-align: 1px;
-}
-
 #hint {
   font-size: 14px;
-  text-align: right;
-  float: right;
-  margin-right: 100px;
-  margin-top: -21px;
-  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-  color: #333;
-}
-
-#fun {
-  font-size: 14px;
-  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-  color: #888;
-  margin-left: 100px;
-  margin-top: 18px;
-}
-
-#fun a {
-  text-decoration: none;
-  color: #08c;
-}
-
-div#debug {
-  position:absolute;
-  top: -24px;
-  right: 100px;
-  z-index: 2;
-}
-
-#debug .debug-button, .normal-button {
-  color: #08c;
-  text-decoration: none;
-  font-size: 14px;
-  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-}
-
-.normal-button {
-  position: absolute;
-  top: -24px;
-  right: 0px;
-  display:none;
-}
-
-#debug .debug-button:hover, .normal-button:hover {
-  color: black;
-}
-
-#debug form.debug {
-  display: none;
-}
-
-#debug .template {
-  display: none;
-}
-
-#debug .template label {
-  width: 150px;
-  display: block;
+  text-align: left;
   float: left;
-  font-size: 14px;
+  margin-top: 20px;
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-  line-height: 22px;
-}
-
-#debug .template .delete {
-  cursor: pointer;
-  font-size: 14px;
-  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-  color: #08c;
-}
-
-#debug .variables {
-}
-
-#debug .variables ul li {
-  font-size: 14px;
-  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-  line-height: 18px;
-}
-
-#debug .variables > ul {
-  padding-left: 20px;
-}
-
-#debug .variables > ul > li > ul {
-  padding-left: 20px;
-}
-
-#debug .variables ul li a {
-  text-decoration: none;
-  color: #08c;
-}
-
-#debug hr {
-  margin-top: 15px;
-  color: #DDDDDD;
-  border: 1px solid;
-  display:none;
-}
-
-#debug hr:last-child {
-  margin-bottom: 0px;
-}
-
-#debug .more {
-  font-size: 12px;
-  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-  text-align: center;
-  margin-bottom: -8px;
-  display: none;
-}
-
-#debug .more a {
-  text-decoration: none;
-  color: #08c;
-}
-
-body.debug #prev-level, body.debug #next-level {
-  display:none;
-}
-
-body.debug #content {
-  width: 1000px;
-  margin-left: 50px;
-  margin-right: 0px;
-}
-
-body.debug #chrono {
-  left: 895px;
-}
-
-body.debug div#debug {
-  top: 0px;
-  left: 1016px;
-  width: 340px;
-  height: 600px;
-  overflow: auto;
-}
-
-body.debug #loading {
-  margin-left: 0px;
-}
-
-body.debug #levels_block {
-  margin-left: 0px;
-}
-
-body.debug #hint {
-  margin-right: 0px;
-}
-
-body.debug #fun {
-  margin-left: 0px;
-}
-
-body.debug #debug .more {
-  display: block;
-}
-
-body.debug .normal-button {
-  display: block;
-}
-
-body.debug #debug hr {
-  display:block;
+  font-weight: bold;
+  color: #333;
 }

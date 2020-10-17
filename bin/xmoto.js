@@ -632,7 +632,7 @@
     Level.prototype.update = function() {
       var dead_player, dead_replay;
       this.physics.update();
-      dead_player = this.options.playable && !this.moto.dead;
+      dead_player = !this.moto.dead;
       if (dead_player || dead_replay) {
         this.update_timer();
       }
@@ -641,9 +641,7 @@
       this.entities.update();
       this.camera.update();
       this.blocks.update();
-      if (this.options.playable) {
-        this.moto.update();
-      }
+      this.moto.update();
       return this.particles.update();
     };
 
@@ -673,21 +671,21 @@
       return this.current_time = new_time;
     };
 
-    Level.prototype.got_strawberries = function() {
-      var j, len, ref, strawberry;
-      ref = this.entities.strawberries;
+    Level.prototype.got_coins = function() {
+      var j, len, ref, coin;
+      ref = this.entities.coins;
       for (j = 0, len = ref.length; j < len; j++) {
-        strawberry = ref[j];
-        if (strawberry.display) {
+        coin = ref[j];
+        if (coin.display) {
           return false;
         }
       }
       return true;
     };
 
-    Level.prototype.respawn_strawberries = function() {
+    Level.prototype.respawn_coins = function() {
       var entity, j, len, ref, results;
-      ref = this.entities.strawberries;
+      ref = this.entities.coins;
       results = [];
       for (j = 0, len = ref.length; j < len; j++) {
         entity = ref[j];
@@ -701,7 +699,7 @@
       this.moto.destroy();
       this.moto = new Moto(this);
       this.moto.init();
-      this.respawn_strawberries();
+      this.respawn_coins();
       this.init_timer();
       return this.update_timer(true);
     };
@@ -726,19 +724,19 @@
       listener = new Box2D.Dynamics.b2ContactListener;
       listener.BeginContact = (function(_this) {
         return function(contact) {
-          var a, b, entity, moto, strawberry;
+          var a, b, entity, moto, coin;
           moto = _this.active_moto();
           a = contact.GetFixtureA().GetBody().GetUserData();
           b = contact.GetFixtureB().GetBody().GetUserData();
           if (!moto.dead) {
-            if (Listeners.does_contact_moto_rider(a, b, 'strawberry')) {
-              strawberry = a.name === 'strawberry' ? contact.GetFixtureA() : contact.GetFixtureB();
-              entity = strawberry.GetBody().GetUserData().entity;
+            if (Listeners.does_contact_moto_rider(a, b, 'coin')) {
+              coin = a.name === 'coin' ? contact.GetFixtureA() : contact.GetFixtureB();
+              entity = coin.GetBody().GetUserData().entity;
               if (entity.display) {
                 return entity.display = false;
               }
             } else if (Listeners.does_contact_moto_rider(a, b, 'end_of_level') && !_this.level.need_to_restart) {
-              if (_this.level.got_strawberries()) {
+              if (_this.level.got_coins()) {
                 if (a.name === 'rider' || b.name === 'rider') {
                   moto = a.name === 'rider' ? a.rider.moto : b.rider.moto;
                 } else {
@@ -827,10 +825,8 @@
         width: 800,
         height: 600,
         replays: [],
-        playable: true,
         zoom: Constants.default_scale.x,
         levels_path: 'data/Levels',
-        scores_path: 'scores',
         replays_path: 'data/Replays'
       };
       options = $.extend(defaults, options);
@@ -1490,7 +1486,7 @@
       this.assets = level.assets;
       this.world = level.physics.world;
       this.list = [];
-      this.strawberries = [];
+      this.coins = [];
       this.wreckers = [];
     }
 
@@ -1616,9 +1612,9 @@
         if (entity.type_id === 'EndOfLevel') {
           this.create_entity(entity, 'end_of_level');
           results.push(this.end_of_level = entity);
-        } else if (entity.type_id === 'Strawberry') {
-          this.create_entity(entity, 'strawberry');
-          results.push(this.strawberries.push(entity));
+        } else if (entity.type_id === 'Coin') {
+          this.create_entity(entity, 'coin');
+          results.push(this.coins.push(entity));
         } else if (entity.type_id === 'Wrecker') {
           this.create_entity(entity, 'wrecker');
           results.push(this.wreckers.push(entity));
@@ -1718,8 +1714,8 @@
       if (entity.type_id === 'Sprite') {
         return entity.params.name;
       } else if (entity.type_id === 'EndOfLevel') {
-        return 'Flower';
-      } else if (entity.type_id === 'Strawberry' || entity.type_id === 'Wrecker') {
+        return 'Finish';
+      } else if (entity.type_id === 'Coin' || entity.type_id === 'Wrecker') {
         return entity.type_id;
       }
     };
@@ -1759,7 +1755,7 @@
     }
 
     Infos.prototype.parse = function(xml) {
-      var xml_border, xml_infos, xml_level, xml_music;
+      var xml_border, xml_infos, xml_level;
       xml_level = $(xml).find('level');
       this.identifier = xml_level.attr('id');
       this.pack_name = xml_level.attr('levelpack');
@@ -1772,8 +1768,6 @@
       this.date = xml_infos.find('date').text();
       xml_border = xml_infos.find('border');
       this.border = xml_border.attr('texture');
-      xml_music = xml_infos.find('music');
-      this.music = xml_music.attr('name');
       return this;
     };
 
