@@ -857,9 +857,9 @@
         replays: [],
         playable: true,
         zoom: Constants.default_scale.x,
-        levels_path: '/data/Levels',
-        scores_path: '/scores',
-        replays_path: '/data/Replays'
+        levels_path: 'data/Levels',
+        scores_path: 'scores',
+        replays_path: 'data/Replays'
       };
       options = $.extend(defaults, options);
       Constants.default_scale = {
@@ -3447,7 +3447,7 @@
         item = ref[j];
         items.push({
           id: item,
-          src: "/data/Textures/Textures/" + (item.toLowerCase())
+          src: "data/Textures/Textures/" + (item.toLowerCase())
         });
       }
       ref1 = this.anims;
@@ -3455,7 +3455,7 @@
         item = ref1[k];
         items.push({
           id: item,
-          src: "/data/Textures/Anims/" + (item.toLowerCase())
+          src: "data/Textures/Anims/" + (item.toLowerCase())
         });
       }
       ref2 = this.effects;
@@ -3463,7 +3463,7 @@
         item = ref2[l];
         items.push({
           id: item,
-          src: "/data/Textures/Effects/" + (item.toLowerCase())
+          src: "data/Textures/Effects/" + (item.toLowerCase())
         });
       }
       ref3 = this.moto;
@@ -3471,7 +3471,7 @@
         item = ref3[m];
         items.push({
           id: item,
-          src: "/data/Textures/Riders/" + (item.toLowerCase()) + ".png"
+          src: "data/Textures/Riders/" + (item.toLowerCase()) + ".png"
         });
       }
       ref4 = this.remove_duplicate_textures(items);
@@ -3681,7 +3681,7 @@
       this.textures = [];
       $.ajax({
         type: "GET",
-        url: "/data/Themes/" + filename,
+        url: "data/Themes/" + filename,
         dataType: "xml",
         success: this.load_theme,
         context: this
