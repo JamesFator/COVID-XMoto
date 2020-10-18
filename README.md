@@ -15,7 +15,7 @@ $ open index.html
 
 ## TODO
 
-1. Incoporate [COVID-19 data](https://github.com/CSSEGISandData/COVID-19/blob/master/csse_covid_19_data/csse_covid_19_daily_reports/10-16-2020.csv)
+1. Incoporate [COVID-19 data](https://github.com/CSSEGISandData/COVID-19/blob/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv)
 2. Generate map based on data
 3. Replace textures with [country flags](https://www.countryflags.io/)
 4. Add Coronavirus balls
