@@ -1,5 +1,5 @@
 (function() {
-  var Assets, Blocks, Camera, Constants, Edges, Entities, Infos, Input, LayerOffsets, Level, Limits, Listeners, Math2D, Moto, MotoFlipService, Physics, Rider, Sky, Theme, b2AABB, b2Body, b2BodyDef, b2CircleShape, b2FixtureDef, b2PolygonShape, b2PrismaticJointDef, b2RevoluteJointDef, b2Settings, b2Vec2, b2World;
+  var Assets, Blocks, Camera, Constants, Edges, Entities, Input, Level, Limits, Listeners, Math2D, Moto, MotoFlipService, Physics, Rider, Sky, Theme, b2AABB, b2Body, b2BodyDef, b2CircleShape, b2FixtureDef, b2PolygonShape, b2PrismaticJointDef, b2RevoluteJointDef, b2Settings, b2Vec2, b2World;
 
   Camera = (function() {
     function Camera(level) {
@@ -517,36 +517,24 @@
       this.input = new Input(this);
       this.listeners = new Listeners(this);
       this.moto = new Moto(this);
-      this.infos = new Infos(this);
       this.sky = new Sky(this);
       this.blocks = new Blocks(this);
       this.limits = new Limits(this);
-      this.layer_offsets = new LayerOffsets(this);
       this.entities = new Entities(this);
     }
 
-    Level.prototype.load_from_file = function(filename, callback) {
+    Level.prototype.load_data = function(callback) {
       // Load theme data
       this.assets.parse_theme(THEME_JSON);
       // Load the level data
-      return $.ajax({
-        type: "GET",
-        url: this.options.levels_path + "/" + filename,
-        dataType: "xml",
-        success: function(xml) {
-          return this.load_level(xml, callback);
-        },
-        context: this
-      });
+      this.load_level(LEVEL_JSON, callback);
     };
 
-    Level.prototype.load_level = function(xml, callback) {
-      this.infos.parse(xml);
-      this.sky.parse(xml);
-      this.blocks.parse(xml);
-      this.limits.parse(xml);
-      this.layer_offsets.parse(xml);
-      this.entities.parse(xml);
+    Level.prototype.load_level = function(level_json, callback) {
+      this.sky.parse(level_json);
+      this.blocks.parse(level_json);
+      this.limits.parse(level_json);
+      this.entities.parse(level_json);
       this.sky.load_assets();
       this.blocks.load_assets();
       this.limits.load_assets();
@@ -734,7 +722,7 @@
 
   })();
 
-  $.xmoto = function(level_filename, options) {
+  $.xmoto = function(options) {
     var bind_render_to_dom, initialize, load_options, main_loop;
     if (options == null) {
       options = {};
@@ -752,7 +740,7 @@
       });
       window.cancelAnimationFrame(window.game_loop);
       bind_render_to_dom(renderer, options);
-      return main_loop(level_filename, renderer, options);
+      return main_loop(renderer, options);
     };
     load_options = function(options) {
       var defaults;
@@ -778,10 +766,10 @@
       $('#xmoto').css('height', options.height);
       $('#xmoto')[0].appendChild(renderer.view);
     };
-    main_loop = function(level_filename, renderer, options) {
+    main_loop = function(renderer, options) {
       var level;
       level = new Level(renderer, options);
-      return level.load_from_file(level_filename, (function(_this) {
+      return level.load_data((function(_this) {
         return function() {
           var update;
           level.init(renderer);
@@ -963,34 +951,21 @@
       this.assets = level.assets;
       this.theme = this.assets.theme;
       this.list = [];
-      this.back_list = [];
-      this.front_list = [];
       this.edges = new Edges(this.level);
     }
 
-    Blocks.prototype.parse = function(xml) {
-      var block, j, k, l, len, len1, len2, material, vertex, xml_block, xml_blocks, xml_material, xml_materials, xml_vertex, xml_vertices;
-      xml_blocks = $(xml).find('block');
-      for (j = 0, len = xml_blocks.length; j < len; j++) {
-        xml_block = xml_blocks[j];
+    Blocks.prototype.parse = function(level_json) {
+      var j, k, len1, len2, block, block_json, vertex, vertex_json;
+      for (j = 0, len1 = level_json.blocks.length; j < len1; j++) {
+        block_json = level_json.blocks[j];
         block = {
-          id: $(xml_block).attr('id'),
+          id: block_json.id,
           position: {
-            x: parseFloat($(xml_block).find('position').attr('x')),
-            y: parseFloat($(xml_block).find('position').attr('y')),
-            dynamic: $(xml_block).find('position').attr('dynamic') === 'true',
-            background: $(xml_block).find('position').attr('background') === 'true'
+            x: parseFloat(block_json.position.x),
+            y: parseFloat(block_json.position.y)
           },
           usetexture: {
-            id: $(xml_block).find('usetexture').attr('id').toLowerCase(),
-            scale: parseFloat($(xml_block).find('usetexture').attr('scale'))
-          },
-          physics: {
-            grip: parseFloat($(xml_block).find('physics').attr('grip'))
-          },
-          edges: {
-            angle: parseFloat($(xml_block).find('edges').attr('angle')),
-            materials: []
+            id: block_json.usetexture.id.toLowerCase()
           },
           vertices: []
         };
@@ -998,30 +973,14 @@
           block.usetexture.id = 'dirt';
         }
         block.texture_name = this.theme.texture_params(block.usetexture.id).file;
-        xml_materials = $(xml_block).find('edges material');
-        for (k = 0, len1 = xml_materials.length; k < len1; k++) {
-          xml_material = xml_materials[k];
-          material = {
-            name: $(xml_material).attr('name'),
-            edge: $(xml_material).attr('edge'),
-            color_r: parseInt($(xml_material).attr('color_r')),
-            color_g: parseInt($(xml_material).attr('color_g')),
-            color_b: parseInt($(xml_material).attr('color_b')),
-            color_a: parseInt($(xml_material).attr('color_a')),
-            scale: parseFloat($(xml_material).attr('scale')),
-            depth: parseFloat($(xml_material).attr('depth'))
-          };
-          block.edges.materials.push(material);
-        }
-        xml_vertices = $(xml_block).find('vertex');
-        for (l = 0, len2 = xml_vertices.length; l < len2; l++) {
-          xml_vertex = xml_vertices[l];
+        for (k = 0, len2 = block_json.vertices.length; k < len2; k++) {
+          vertex_json = block_json.vertices[k];
           vertex = {
-            x: parseFloat($(xml_vertex).attr('x')),
-            y: parseFloat($(xml_vertex).attr('y')),
-            absolute_x: parseFloat($(xml_vertex).attr('x')) + block.position.x,
-            absolute_y: parseFloat($(xml_vertex).attr('y')) + block.position.y,
-            edge: $(xml_vertex).attr('edge') ? $(xml_vertex).attr('edge').toLowerCase() : void 0
+            x: parseFloat(vertex_json.x),
+            y: parseFloat(vertex_json.y),
+            absolute_x: parseFloat(vertex_json.x) + block.position.x,
+            absolute_y: parseFloat(vertex_json.y) + block.position.y,
+            edge: vertex_json.edge ? vertex_json.edge.toLowerCase() : void 0
           };
           block.vertices.push(vertex);
         }
@@ -1029,15 +988,7 @@
         block.edges_list.parse();
         block.aabb = this.compute_aabb(block);
         this.list.push(block);
-        if (block.position.background) {
-          this.back_list.push(block);
-        } else {
-          this.front_list.push(block);
-        }
       }
-      this.list.sort(this.sort_blocks_by_texture);
-      this.back_list.sort(this.sort_blocks_by_texture);
-      this.front_list.sort(this.sort_blocks_by_texture);
       return this;
     };
 
@@ -1069,7 +1020,7 @@
     Blocks.prototype.init_physics_parts = function() {
       var block, ground, j, len, ref, results;
       ground = Constants.ground;
-      ref = this.front_list;
+      ref = this.list;
       results = [];
       for (j = 0, len = ref.length; j < len; j++) {
         block = ref[j];
@@ -1080,7 +1031,7 @@
 
     Blocks.prototype.init_sprites = function() {
       var block, j, k, len, len1, mask, points, ref, ref1, results, size_x, size_y, texture, vertex;
-      ref = this.back_list.concat(this.front_list);
+      ref = this.list;
       results = [];
       for (j = 0, len = ref.length; j < len; j++) {
         block = ref[j];
@@ -1163,16 +1114,6 @@
       aabb.lowerBound.Set(lower_bound.x, lower_bound.y);
       aabb.upperBound.Set(upper_bound.x, upper_bound.y);
       return aabb;
-    };
-
-    Blocks.prototype.sort_blocks_by_texture = function(a, b) {
-      if (a.usetexture.id > b.usetexture.id) {
-        return 1;
-      }
-      if (a.usetexture.id <= b.usetexture.id) {
-        return -1;
-      }
-      return 0;
     };
 
     return Blocks;
@@ -1356,33 +1297,33 @@
       this.wreckers = [];
     }
 
-    Entities.prototype.parse = function(xml) {
-      var entity, j, k, len, len1, name, sprite, texture_name, value, xml_entities, xml_entity, xml_param, xml_params;
-      xml_entities = $(xml).find('entity');
-      for (j = 0, len = xml_entities.length; j < len; j++) {
-        xml_entity = xml_entities[j];
+    Entities.prototype.parse = function(level_json) {
+      var entity, j, k, len1, len2, name, sprite, texture_name, value, entity_json, param_json;
+      for (j = 0, len1 = level_json.entities.length; j < len1; j++) {
+        entity_json = level_json.entities[j];
         entity = {
-          id: $(xml_entity).attr('id'),
-          type_id: $(xml_entity).attr('typeid'),
+          id: entity_json.id,
+          type_id: entity_json.typeid,
           size: {
-            r: parseFloat($(xml_entity).find('size').attr('r')),
-            z: parseInt($(xml_entity).find('size').attr('z')) || void 0,
-            width: parseFloat($(xml_entity).find('size').attr('width')),
-            height: parseFloat($(xml_entity).find('size').attr('height'))
+            r: parseFloat(entity_json.size.r),
+            z: parseInt(entity_json.size.z) || void 0,
+            width: parseFloat(entity_json.size.width),
+            height: parseFloat(entity_json.size.height)
           },
           position: {
-            x: parseFloat($(xml_entity).find('position').attr('x')),
-            y: parseFloat($(xml_entity).find('position').attr('y')),
-            angle: parseFloat($(xml_entity).find('position').attr('angle')) || 0
+            x: parseFloat(entity_json.position.x),
+            y: parseFloat(entity_json.position.y),
+            angle: parseFloat(entity_json.position.angle) || 0
           },
           params: {}
         };
-        xml_params = $(xml_entity).find('param');
-        for (k = 0, len1 = xml_params.length; k < len1; k++) {
-          xml_param = xml_params[k];
-          name = $(xml_param).attr('name');
-          value = $(xml_param).attr('value');
-          entity.params[name] = value;
+        if (entity_json.param) {
+          for (k = 0, len2 = entity_json.param.length; k < len2; k++) {
+            param_json = entity_json.param[k];
+            name = param_json.name;
+            value = param_json.value;
+            entity.params[name] = value;
+          }
         }
         entity['z'] = entity.size.z || parseInt(entity.params.z) || 0;
         texture_name = this.entity_texture_name(entity);
@@ -1612,63 +1553,6 @@
 
   })();
 
-  Infos = (function() {
-    function Infos(level) {
-      this.level = level;
-      this.assets = level.assets;
-    }
-
-    Infos.prototype.parse = function(xml) {
-      var xml_border, xml_infos, xml_level;
-      xml_level = $(xml).find('level');
-      this.identifier = xml_level.attr('id');
-      this.pack_name = xml_level.attr('levelpack');
-      this.pack_id = xml_level.attr('levelpackNum');
-      this.r_version = xml_level.attr('rversion');
-      xml_infos = $(xml).find('level').find('info');
-      this.name = xml_infos.find('name').text();
-      this.description = xml_infos.find('description').text();
-      this.author = xml_infos.find('author').text();
-      this.date = xml_infos.find('date').text();
-      xml_border = xml_infos.find('border');
-      this.border = xml_border.attr('texture');
-      return this;
-    };
-
-    return Infos;
-
-  })();
-
-  LayerOffsets = (function() {
-    function LayerOffsets(level) {
-      this.level = level;
-      this.assets = level.assets;
-      this.list = [];
-    }
-
-    LayerOffsets.prototype.parse = function(xml) {
-      var j, layer_offset, len, xml_layer_offset, xml_layer_offsets;
-      xml_layer_offsets = $(xml).find('layeroffsets layeroffset');
-      for (j = 0, len = xml_layer_offsets.length; j < len; j++) {
-        xml_layer_offset = xml_layer_offsets[j];
-        layer_offset = {
-          x: parseFloat($(xml_layer_offset).attr('x')),
-          y: parseFloat($(xml_layer_offset).attr('y')),
-          front_layer: $(xml_layer_offset).attr('frontlayer')
-        };
-        this.list.push(layer_offset);
-      }
-      return this;
-    };
-
-    LayerOffsets.prototype.init = function() {};
-
-    LayerOffsets.prototype.display = function(ctx) {};
-
-    return LayerOffsets;
-
-  })();
-
   b2Vec2 = Box2D.Common.Math.b2Vec2;
 
   b2AABB = Box2D.Collision.b2AABB;
@@ -1680,20 +1564,18 @@
       this.theme = this.assets.theme;
     }
 
-    Limits.prototype.parse = function(xml) {
-      var xml_limits;
-      xml_limits = $(xml).find('limits');
+    Limits.prototype.parse = function(level_json) {
       this.player = {
-        left: parseFloat(xml_limits.attr('left')),
-        right: parseFloat(xml_limits.attr('right')),
-        top: parseFloat(xml_limits.attr('top')),
-        bottom: parseFloat(xml_limits.attr('bottom'))
+        left: parseFloat(level_json.limits.left),
+        right: parseFloat(level_json.limits.right),
+        top: parseFloat(level_json.limits.top),
+        bottom: parseFloat(level_json.limits.bottom)
       };
       this.screen = {
-        left: parseFloat(xml_limits.attr('left')) - 20,
-        right: parseFloat(xml_limits.attr('right')) + 20,
-        top: parseFloat(xml_limits.attr('top')) + 20,
-        bottom: parseFloat(xml_limits.attr('bottom')) - 20
+        left: parseFloat(level_json.limits.left) - 20,
+        right: parseFloat(level_json.limits.right) + 20,
+        top: parseFloat(level_json.limits.top) + 20,
+        bottom: parseFloat(level_json.limits.bottom) - 20
       };
       this.size = {
         x: this.screen.right - this.screen.left,
@@ -1871,11 +1753,7 @@
     }
 
     Sky.prototype.parse = function(level_json) {
-      this.name = "sky";
-      // this.name = level_json.info.sky.toLowerCase();
-      // if (this.name === '') {
-      //   console.log('Sky not set in level info.');
-      // }
+      this.name = level_json.sky;
       this.filename = this.theme.texture_params(this.name).file;
       return this;
     };

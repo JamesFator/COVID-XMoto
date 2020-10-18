@@ -1,14 +1,5 @@
-{
-    "id": "_iL26_",
-    "levelpack": "Classical",
-    "levelpackNum": "26",
-    "info": {
-       "name": "No Doubt",
-       "description": "",
-       "author": "cow",
-       "date": "",
-       "sky": "sky"
-    },
+LEVEL_JSON = {
+   "sky": "sky",
     "limits": {
        "left": "-40.000000",
        "right": "40.000000",
