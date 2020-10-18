@@ -1,1089 +1,139 @@
-LEVEL_JSON = {
-   "sky": "sky",
-    "limits": {
-       "left": "-40.000000",
-       "right": "40.000000",
-       "top": "20.000000",
-       "bottom": "-20.000000"
+CONFIRMED_URL =
+  "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv";
+XAXIS_MULTIPLIER = 0.7;
+YAXIS_MULTIPLIER = 0.0002;
+// YAXIS_MULTIPLIER = 0.1;
+
+load_covid_level = function (xmoto_ref, callback) {
+  return $.get(CONFIRMED_URL, function (confirmed_csv) {
+    return load_covid_level_helper(confirmed_csv, xmoto_ref, callback);
+  });
+};
+
+load_covid_level_helper = function (confirmed_csv, xmoto_ref, callback) {
+  var country_confirmed_map = parse_csv_data(confirmed_csv);
+  var country_new_cases_map = convert_to_new_cases_map(country_confirmed_map);
+  var us_timeseries = country_new_cases_map["US"];
+  var num_days = us_timeseries.length;
+  var level_json = initial_level_json(
+    num_days,
+    Math.max.apply(null, us_timeseries)
+  );
+  block = {
+    id: "US",
+    position: {
+      x: 0.0,
+      y: 0.0,
     },
-    "blocks": [
-       {
-          "position": {
-             "x": "-16.166664",
-             "y": "-15.666667"
-          },
-          "usetexture": {
-             "id": "default"
-          },
-          "vertices": [
-             {
-                "x": "-18.833336",
-                "y": "-4.333332",
-                "edge": "Grass"
-             },
-             {
-                "x": "-7.833336",
-                "y": "-3.333334",
-                "edge": "Grass"
-             },
-             {
-                "x": "0.166664",
-                "y": "-0.333334",
-                "edge": "Grass"
-             },
-             {
-                "x": "5.166664",
-                "y": "7.666668",
-                "edge": "Grass"
-             },
-             {
-                "x": "11.166664",
-                "y": "7.666668",
-                "edge": "Grass"
-             },
-             {
-                "x": "11.166664",
-                "y": "-4.333332",
-                "edge": "Grass"
-             }
-          ],
-          "id": "Block0"
-       },
-       {
-          "position": {
-             "x": "5.375000",
-             "y": "-15.125000"
-          },
-          "usetexture": {
-             "id": "default"
-          },
-          "vertices": [
-             {
-                "x": "-10.375000",
-                "y": "7.125000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-8.375000",
-                "y": "5.125000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-3.375000",
-                "y": "0.125000",
-                "edge": "Grass"
-             },
-             {
-                "x": "1.625000",
-                "y": "-1.875000",
-                "edge": "Grass"
-             },
-             {
-                "x": "7.625000",
-                "y": "-1.875000",
-                "edge": "Grass"
-             },
-             {
-                "x": "11.625000",
-                "y": "1.125000",
-                "edge": "Grass"
-             },
-             {
-                "x": "11.625000",
-                "y": "-4.875000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-10.375000",
-                "y": "-4.875000",
-                "edge": "Grass"
-             }
-          ],
-          "id": "Block1"
-       },
-       {
-          "position": {
-             "x": "30.142857",
-             "y": "-12.285714"
-          },
-          "usetexture": {
-             "id": "default"
-          },
-          "vertices": [
-             {
-                "x": "-8.142853",
-                "y": "-0.714286",
-                "edge": "Grass"
-             },
-             {
-                "x": "-6.142854",
-                "y": "1.285714",
-                "edge": "Grass"
-             },
-             {
-                "x": "-1.142853",
-                "y": "2.285714",
-                "edge": "Grass"
-             },
-             {
-                "x": "3.857147",
-                "y": "6.285714",
-                "edge": "Grass"
-             },
-             {
-                "x": "9.857147",
-                "y": "6.285714",
-                "edge": "Grass"
-             },
-             {
-                "x": "9.857147",
-                "y": "-7.714286",
-                "edge": "Grass"
-             },
-             {
-                "x": "-8.142853",
-                "y": "-7.714286",
-                "edge": "Grass"
-             }
-          ],
-          "id": "Block2"
-       },
-       {
-          "position": {
-             "x": "37.400002",
-             "y": "-5.200000"
-          },
-          "usetexture": {
-             "id": "default"
-          },
-          "vertices": [
-             {
-                "x": "-3.400045",
-                "y": "-0.800004",
-                "edge": "Grass"
-             },
-             {
-                "x": "-1.400045",
-                "y": "1.199997",
-                "edge": "Grass"
-             },
-             {
-                "x": "-0.400045",
-                "y": "0.199996",
-                "edge": "Grass"
-             },
-             {
-                "x": "2.599955",
-                "y": "0.199996",
-                "edge": "Grass"
-             },
-             {
-                "x": "2.599955",
-                "y": "-0.800004",
-                "edge": "Grass"
-             }
-          ],
-          "id": "Block3"
-       },
-       {
-          "position": {
-             "x": "24.125000",
-             "y": "-3.500000"
-          },
-          "usetexture": {
-             "id": "default"
-          },
-          "vertices": [
-             {
-                "x": "8.875000",
-                "y": "0.500000",
-                "edge": "Grass"
-             },
-             {
-                "x": "4.875000",
-                "y": "-1.500000",
-                "edge": "Grass"
-             },
-             {
-                "x": "3.875000",
-                "y": "-1.500000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-4.125000",
-                "y": "0.500000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-10.125000",
-                "y": "1.500000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-8.125000",
-                "y": "1.500000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-3.125000",
-                "y": "0.500000",
-                "edge": "Grass"
-             },
-             {
-                "x": "4.875000",
-                "y": "-0.500000",
-                "edge": "Grass"
-             }
-          ],
-          "id": "Block4"
-       },
-       {
-          "position": {
-             "x": "0.000000",
-             "y": "-0.000000"
-          },
-          "usetexture": {
-             "id": "default"
-          },
-          "vertices": [
-             {
-                "x": "8.000000",
-                "y": "-3.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-1.000000",
-                "y": "-4.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-15.000000",
-                "y": "-2.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-13.000000",
-                "y": "-2.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-3.000000",
-                "y": "-3.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "0.000000",
-                "y": "-3.000000",
-                "edge": "Grass"
-             }
-          ],
-          "id": "Block5"
-       },
-       {
-          "position": {
-             "x": "-0.000000",
-             "y": "0.000000"
-          },
-          "usetexture": {
-             "id": "default"
-          },
-          "vertices": [
-             {
-                "x": "-23.000000",
-                "y": "-4.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-21.000000",
-                "y": "-5.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-40.000000",
-                "y": "-5.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-40.000000",
-                "y": "7.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-37.000000",
-                "y": "7.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-31.000000",
-                "y": "-2.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-29.000000",
-                "y": "-3.000000",
-                "edge": "Grass"
-             }
-          ],
-          "id": "Block6"
-       },
-       {
-          "position": {
-             "x": "0.000002",
-             "y": "-0.000002"
-          },
-          "usetexture": {
-             "id": "default"
-          },
-          "vertices": [
-             {
-                "x": "-32.000000",
-                "y": "6.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-30.000000",
-                "y": "5.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-26.000000",
-                "y": "7.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-23.000000",
-                "y": "5.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-18.000000",
-                "y": "9.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-14.000002",
-                "y": "5.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-11.000002",
-                "y": "7.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-8.000002",
-                "y": "5.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-8.000002",
-                "y": "4.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-32.000000",
-                "y": "5.000000",
-                "edge": "Grass"
-             }
-          ],
-          "id": "Block7"
-       },
-       {
-          "position": {
-             "x": "14.000000",
-             "y": "7.625000"
-          },
-          "usetexture": {
-             "id": "default"
-          },
-          "vertices": [
-             {
-                "x": "-19.000000",
-                "y": "-3.625000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-11.000000",
-                "y": "-3.625000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-7.000000",
-                "y": "-2.625000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-3.000000",
-                "y": "-0.625000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-1.000000",
-                "y": "2.375000",
-                "edge": "Grass"
-             },
-             {
-                "x": "0.000000",
-                "y": "5.375000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-1.000000",
-                "y": "8.375000",
-                "edge": "Grass"
-             },
-             {
-                "x": "4.000000",
-                "y": "8.375000",
-                "edge": "Grass"
-             },
-             {
-                "x": "3.000000",
-                "y": "5.375000",
-                "edge": "Grass"
-             },
-             {
-                "x": "3.000000",
-                "y": "2.375000",
-                "edge": "Grass"
-             },
-             {
-                "x": "4.000000",
-                "y": "0.375000",
-                "edge": "Grass"
-             },
-             {
-                "x": "7.000000",
-                "y": "-2.625000",
-                "edge": "Grass"
-             },
-             {
-                "x": "10.000000",
-                "y": "-3.625000",
-                "edge": "Grass"
-             },
-             {
-                "x": "15.000000",
-                "y": "-3.625000",
-                "edge": "Grass"
-             },
-             {
-                "x": "15.000000",
-                "y": "-5.625000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-19.000000",
-                "y": "-5.625000",
-                "edge": "Grass"
-             }
-          ],
-          "id": "Block8"
-       },
-       {
-          "position": {
-             "x": "5.250000",
-             "y": "12.000000"
-          },
-          "usetexture": {
-             "id": "default"
-          },
-          "vertices": [
-             {
-                "x": "5.750000",
-                "y": "1.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "4.750000",
-                "y": "0.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-9.250000",
-                "y": "-1.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-9.250000",
-                "y": "0.000000",
-                "edge": "Grass"
-             }
-          ],
-          "id": "Block9"
-       },
-       {
-          "position": {
-             "x": "0.000000",
-             "y": "0.000000"
-          },
-          "usetexture": {
-             "id": "default"
-          },
-          "vertices": [
-             {
-                "x": "-12.000000",
-                "y": "16.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-9.000000",
-                "y": "17.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-7.000000",
-                "y": "14.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-5.000000",
-                "y": "13.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-4.000000",
-                "y": "12.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-4.000000",
-                "y": "11.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-15.000000",
-                "y": "11.000000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-15.000000",
-                "y": "16.000000",
-                "edge": "Grass"
-             }
-          ],
-          "id": "Block10"
-       },
-       {
-          "position": {
-             "x": "0.250000",
-             "y": "-0.250000"
-          },
-          "usetexture": {
-             "id": "default"
-          },
-          "vertices": [
-             {
-                "x": "-4.250000",
-                "y": "16.250000",
-                "edge": "Grass"
-             },
-             {
-                "x": "12.750000",
-                "y": "17.250000",
-                "edge": "Grass"
-             },
-             {
-                "x": "12.750000",
-                "y": "16.250000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-4.250000",
-                "y": "15.250000",
-                "edge": "Grass"
-             }
-          ],
-          "id": "Block11"
-       },
-       {
-          "position": {
-             "x": "31.166666",
-             "y": "14.500000"
-          },
-          "usetexture": {
-             "id": "default"
-          },
-          "vertices": [
-             {
-                "x": "-11.166655",
-                "y": "-2.500000",
-                "edge": "Grass"
-             },
-             {
-                "x": "3.833345",
-                "y": "-0.500000",
-                "edge": "Grass"
-             },
-             {
-                "x": "6.833345",
-                "y": "1.500000",
-                "edge": "Grass"
-             },
-             {
-                "x": "7.833345",
-                "y": "0.500000",
-                "edge": "Grass"
-             },
-             {
-                "x": "3.833345",
-                "y": "-1.500000",
-                "edge": "Grass"
-             },
-             {
-                "x": "-11.166655",
-                "y": "-3.500000",
-                "edge": "Grass"
-             }
-          ],
-          "id": "Block12"
-       },
-       {
-          "position": {
-             "x": "-38.071430",
-             "y": "-9.285703"
-          },
-          "usetexture": {
-             "id": "default"
-          },
-          "vertices": [
-             {
-                "x": "1.071458",
-                "y": "28.285702",
-                "edge": "Grass"
-             },
-             {
-                "x": "2.071457",
-                "y": "28.285702",
-                "edge": "Grass"
-             },
-             {
-                "x": "2.071457",
-                "y": "27.285706",
-                "edge": "Grass"
-             },
-             {
-                "x": "2.071457",
-                "y": "26.285706",
-                "edge": "Grass"
-             },
-             {
-                "x": "1.071458",
-                "y": "26.285706",
-                "edge": "Grass"
-             },
-             {
-                "x": "1.071458",
-                "y": "27.285706",
-                "edge": "Grass"
-             },
-             {
-                "x": "0.071458",
-                "y": "27.285706",
-                "edge": "Grass"
-             },
-             {
-                "x": "0.071458",
-                "y": "24.285706",
-                "edge": "Grass"
-             },
-             {
-                "x": "1.071458",
-                "y": "24.285706",
-                "edge": "Grass"
-             },
-             {
-                "x": "1.071458",
-                "y": "25.285706",
-                "edge": "Grass"
-             },
-             {
-                "x": "2.071457",
-                "y": "25.285706",
-                "edge": "Grass"
-             },
-             {
-                "x": "2.071457",
-                "y": "22.285706",
-                "edge": "Grass"
-             },
-             {
-                "x": "-0.928542",
-                "y": "22.285706",
-                "edge": "Grass"
-             },
-             {
-                "x": "-0.928542",
-                "y": "28.285702",
-                "edge": "Grass"
-             }
-          ],
-          "id": "Block13"
-       },
-       {
-          "position": {
-             "x": "2.999990",
-             "y": "26.799999"
-          },
-          "usetexture": {
-             "id": "default"
-          },
-          "vertices": [
-             {
-                "x": "-38.000000",
-                "y": "-7.800001",
-                "edge": "Grass"
-             },
-             {
-                "x": "-35.000000",
-                "y": "-7.800001",
-                "edge": "Grass"
-             },
-             {
-                "x": "-35.000000",
-                "y": "-13.800001",
-                "edge": "Grass"
-             },
-             {
-                "x": "-38.000000",
-                "y": "-13.800001",
-                "edge": "Grass"
-             },
-             {
-                "x": "-38.000000",
-                "y": "-12.800001",
-                "edge": "Grass"
-             },
-             {
-                "x": "-36.000000",
-                "y": "-12.800001",
-                "edge": "Grass"
-             },
-             {
-                "x": "-36.000000",
-                "y": "-8.800001",
-                "edge": "Grass"
-             },
-             {
-                "x": "-37.000000",
-                "y": "-8.800001",
-                "edge": "Grass"
-             },
-             {
-                "x": "-37.000000",
-                "y": "-11.799999",
-                "edge": "Grass"
-             },
-             {
-                "x": "-38.000000",
-                "y": "-11.799999",
-                "edge": "Grass"
-             }
-          ],
-          "id": "Block14"
-       },
-       {
-          "position": {
-             "x": "0.000007",
-             "y": "28.764696"
-          },
-          "usetexture": {
-             "id": "default"
-          },
-          "vertices": [
-             {
-                "x": "-31.000000",
-                "y": "-9.764696",
-                "edge": "Grass"
-             },
-             {
-                "x": "-30.000000",
-                "y": "-9.764696",
-                "edge": "Grass"
-             },
-             {
-                "x": "-30.000000",
-                "y": "-13.764694",
-                "edge": "Grass"
-             },
-             {
-                "x": "-30.000000",
-                "y": "-14.764696",
-                "edge": "Grass"
-             },
-             {
-                "x": "-29.000000",
-                "y": "-13.764694",
-                "edge": "Grass"
-             },
-             {
-                "x": "-28.000000",
-                "y": "-14.764696",
-                "edge": "Grass"
-             },
-             {
-                "x": "-28.000000",
-                "y": "-9.764696",
-                "edge": "Grass"
-             },
-             {
-                "x": "-27.000000",
-                "y": "-9.764696",
-                "edge": "Grass"
-             },
-             {
-                "x": "-26.000000",
-                "y": "-8.764694",
-                "edge": "Grass"
-             },
-             {
-                "x": "-26.000000",
-                "y": "-9.764696",
-                "edge": "Grass"
-             },
-             {
-                "x": "-27.000000",
-                "y": "-10.764696",
-                "edge": "Grass"
-             },
-             {
-                "x": "-27.000000",
-                "y": "-15.764696",
-                "edge": "Grass"
-             },
-             {
-                "x": "-28.000000",
-                "y": "-15.764696",
-                "edge": "Grass"
-             },
-             {
-                "x": "-29.000000",
-                "y": "-14.764696",
-                "edge": "Grass"
-             },
-             {
-                "x": "-30.000000",
-                "y": "-15.764696",
-                "edge": "Grass"
-             },
-             {
-                "x": "-31.000000",
-                "y": "-15.764696",
-                "edge": "Grass"
-             },
-             {
-                "x": "-31.000000",
-                "y": "-10.764696",
-                "edge": "Grass"
-             }
-          ],
-          "id": "Block15"
-       }
+    usetexture: {
+      id: "default",
+    },
+    vertices: [
+      {
+        x: 0.0,
+        y: 0.0,
+      },
     ],
-    "entities": [
-       {
-          "size": {
-             "r": "0.400000"
-          },
-          "position": {
-             "x": "-35.000000",
-             "y": "-19.000000"
-          },
-          "id": "MyPlayerStart0",
-          "typeid": "PlayerStart"
-       },
-       {
-          "size": {
-             "r": "0.500000"
-          },
-          "position": {
-             "x": "38.000000",
-             "y": "19.000000"
-          },
-          "param": {
-             "name": "style",
-             "value": "default"
-          },
-          "id": "MyEndOfLevel0",
-          "typeid": "EndOfLevel"
-       },
-       {
-          "size": {
-             "r": "0.400000"
-          },
-          "position": {
-             "x": "18.000000",
-             "y": "-1.000000"
-          },
-          "param": {
-             "name": "style",
-             "value": "default"
-          },
-          "id": "MyWrecker0",
-          "typeid": "Wrecker"
-       },
-       {
-          "size": {
-             "r": "0.400000"
-          },
-          "position": {
-             "x": "18.000000",
-             "y": "-16.000000"
-          },
-          "param": {
-             "name": "style",
-             "value": "default"
-          },
-          "id": "MyWrecker1",
-          "typeid": "Wrecker"
-       },
-       {
-          "size": {
-             "r": "0.400000"
-          },
-          "position": {
-             "x": "19.000000",
-             "y": "-16.000000"
-          },
-          "param": {
-             "name": "style",
-             "value": "default"
-          },
-          "id": "MyWrecker2",
-          "typeid": "Wrecker"
-       },
-       {
-          "size": {
-             "r": "0.400000"
-          },
-          "position": {
-             "x": "20.000000",
-             "y": "-16.000000"
-          },
-          "param": {
-             "name": "style",
-             "value": "default"
-          },
-          "id": "MyWrecker3",
-          "typeid": "Wrecker"
-       },
-       {
-          "size": {
-             "r": "0.400000"
-          },
-          "position": {
-             "x": "21.000000",
-             "y": "-16.000000"
-          },
-          "param": {
-             "name": "style",
-             "value": "default"
-          },
-          "id": "MyWrecker4",
-          "typeid": "Wrecker"
-       },
-       {
-          "size": {
-             "r": "0.400000"
-          },
-          "position": {
-             "x": "8.000000",
-             "y": "11.000000"
-          },
-          "param": {
-             "name": "style",
-             "value": "default"
-          },
-          "id": "MyWrecker5",
-          "typeid": "Wrecker"
-       },
-       {
-          "size": {
-             "r": "0.500000"
-          },
-          "position": {
-             "x": "18.000000",
-             "y": "14.000000"
-          },
-          "id": "MyCoin0",
-          "typeid": "Coin"
-       },
-       {
-          "size": {
-             "r": "0.500000"
-          },
-          "position": {
-             "x": "28.000000",
-             "y": "5.000000"
-          },
-          "id": "MyCoin1",
-          "typeid": "Coin"
-       },
-       {
-          "size": {
-             "r": "0.500000"
-          },
-          "position": {
-             "x": "3.000000",
-             "y": "5.000000"
-          },
-          "id": "MyCoin2",
-          "typeid": "Coin"
-       },
-       {
-          "size": {
-             "r": "0.500000"
-          },
-          "position": {
-             "x": "12.000000",
-             "y": "14.000000"
-          },
-          "id": "MyCoin3",
-          "typeid": "Coin"
-       },
-       {
-          "size": {
-             "r": "0.500000"
-          },
-          "position": {
-             "x": "-14.000000",
-             "y": "17.000000"
-          },
-          "id": "MyCoin4",
-          "typeid": "Coin"
-       },
-       {
-          "size": {
-             "r": "0.500000"
-          },
-          "position": {
-             "x": "-6.000000",
-             "y": "-7.000000"
-          },
-          "id": "MyCoin5",
-          "typeid": "Coin"
-       },
-       {
-          "size": {
-             "r": "0.500000"
-          },
-          "position": {
-             "x": "38.000000",
-             "y": "-4.000000"
-          },
-          "id": "MyCoin6",
-          "typeid": "Coin"
-       },
-       {
-          "size": {
-             "r": "0.500000"
-          },
-          "position": {
-             "x": "11.000000",
-             "y": "-2.000000"
-          },
-          "id": "MyCoin7",
-          "typeid": "Coin"
-       }
-    ]
- }
+  };
+  for (var day = 0; day < num_days; day++) {
+    // Add a vertex based on that day's data
+    block.vertices.push({
+      x: (day + 1) * XAXIS_MULTIPLIER,
+      y: us_timeseries[day] * YAXIS_MULTIPLIER,
+      edge: "Grass",
+    });
+  }
+  // Add the final vertex which drops the block to the ground
+  block.vertices.push({
+    x: num_days * XAXIS_MULTIPLIER,
+    y: 0.0,
+  });
+  level_json.blocks.push(block);
+  console.log(level_json);
+  return callback(xmoto_ref, level_json);
+};
+
+parse_csv_data = function (timeseries_csv) {
+  var country_timeseries_map = {};
+  // Iterate over the lines, ignoring the first row (column names)
+  var lines = timeseries_csv.split("\n");
+  // The number of days in the timeseries is the number of columns we have,
+  // minus the few header columns we have.
+  for (var i = 1; i < lines.length; i++) {
+    var line = lines[i];
+    var columns = line.split(",");
+    var country = columns[1];
+    if (!(country in country_timeseries_map)) {
+      country_timeseries_map[country] = [];
+      for (var j = 4; j < columns.length; j++) {
+        country_timeseries_map[country].push(Math.max(0, parseInt(columns[j])));
+      }
+    } else {
+      // Some countries have multiple rows, so append the results
+      for (var j = 4; j < columns.length; j++) {
+        country_timeseries_map[country][j - 4] += Math.max(
+          0,
+          parseFloat(columns[j])
+        );
+      }
+    }
+  }
+  return country_timeseries_map;
+};
+
+convert_to_new_cases_map = function (country_confirmed_map) {
+  var country_new_cases_map = {};
+  for (var country of Object.keys(country_confirmed_map)) {
+    country_new_cases_map[country] = [];
+    var prev = 0;
+    for (var day = 0; day < country_confirmed_map[country].length; day++) {
+      // New cases is the current confirmed minus the previous day's confirmed.
+      var new_cases = country_confirmed_map[country][day] - prev;
+      country_new_cases_map[country].push(new_cases);
+      prev = country_confirmed_map[country][day];
+    }
+  }
+  // Perform a moving average to smooth out the mountain.
+  // Otherwise it would be unplayable.
+  for (var country of Object.keys(country_new_cases_map)) {
+    var new_cases = country_new_cases_map[country];
+    var averaged_new_cases = [];
+    for (var i = 1; i < new_cases.length - 2; i++) {
+      var mean =
+        (new_cases[i] +
+          new_cases[i - 1] +
+          new_cases[i + 1] +
+          new_cases[i + 2]) /
+        4.0;
+      averaged_new_cases.push([mean]);
+    }
+    country_new_cases_map[country] = averaged_new_cases;
+  }
+  return country_new_cases_map;
+};
+
+initial_level_json = function (num_days, max_height) {
+  return {
+    sky: "sky",
+    limits: {
+      left: "-1.0",
+      right: num_days * XAXIS_MULTIPLIER,
+      top: max_height + 2.0,
+      bottom: "0.0",
+    },
+    blocks: [],
+    entities: [
+      {
+        size: {
+          r: "0.400000",
+        },
+        position: {
+          x: "0.0",
+          y: "1.0",
+        },
+        id: "MyPlayerStart0",
+        typeid: "PlayerStart",
+      },
+    ],
+  };
+};

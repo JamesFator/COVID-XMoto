@@ -1,8 +1,10 @@
-COVID XMoto
-========
+# COVID XMoto
 
-Uses a heavily modified version of [XMoto.js](https://github.com/MichaelHoste/xmoto.js) with levels generated from COVID-19 data.
+The COVID-19 confirmed cases timeseries has become a mountain which you must climb with your motorcycle!
 
+Pull the most recent JHU CSSE COVID-19 Data and runs a heavily modified version of [XMoto.js](https://github.com/MichaelHoste/xmoto.js).
+
+COVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University.
 
 ## Running locally
 
