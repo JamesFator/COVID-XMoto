@@ -2,7 +2,8 @@ CONFIRMED_URL =
   "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv";
 XAXIS_MULTIPLIER = 0.7;
 YAXIS_MULTIPLIER = 0.00025;
-// YAXIS_MULTIPLIER = 0.1;
+
+FIRST_DATA_DATE = "1/22/20";
 
 load_covid_level = function (xmoto_ref, callback) {
   return $.get(CONFIRMED_URL, function (confirmed_csv) {
@@ -13,13 +14,7 @@ load_covid_level = function (xmoto_ref, callback) {
 load_covid_level_helper = function (confirmed_csv, xmoto_ref, callback) {
   var country_confirmed_map = parse_csv_data(confirmed_csv);
   var country_new_cases_map = convert_to_new_cases_map(country_confirmed_map);
-  var us_timeseries =
-    country_new_cases_map[Object.keys(country_new_cases_map)[0]];
-  var num_days = us_timeseries.length;
-  var level_json = initial_level_json(
-    num_days,
-    Math.max.apply(null, us_timeseries)
-  );
+  var level_json = initial_level_json(country_new_cases_map);
 
   for (var country of Object.keys(country_confirmed_map)) {
     add_block_for_country(level_json, country_new_cases_map, country);
@@ -91,7 +86,25 @@ convert_to_new_cases_map = function (country_confirmed_map) {
   return country_new_cases_map;
 };
 
-initial_level_json = function (num_days, max_height) {
+initial_level_json = function (country_new_cases_map) {
+  var num_days =
+    country_new_cases_map[Object.keys(country_new_cases_map)[0]].length;
+  // Determine the highest point so we can set our top bound
+  // also determine our largest final point so we can set our Finish
+  var max_height = 0.0;
+  var max_last_day = 0.0;
+  for (var country of Object.keys(country_new_cases_map)) {
+    var country_timeseries = country_new_cases_map[country];
+    var local_max = Math.max.apply(null, country_timeseries);
+    if (local_max > max_height) {
+      max_height = local_max;
+    }
+
+    var last_day = country_timeseries[num_days - 1];
+    if (last_day > max_last_day) {
+      max_last_day = last_day;
+    }
+  }
   return {
     sky: "sky",
     limits: {
@@ -118,11 +131,44 @@ initial_level_json = function (num_days, max_height) {
           r: "0.50000",
         },
         position: {
-          x: "18.0",
-          y: "1.0",
+          x: "17.0",
+          y: "1.5",
         },
-        id: "MyEndOfLevel0",
-        typeid: "EndOfLevel",
+        id: "Outbreak",
+        typeid: "Wrecker",
+      },
+      {
+        size: {
+          r: "0.50000",
+        },
+        position: {
+          x: "56.0",
+          y: "9.0",
+        },
+        id: "Wave1",
+        typeid: "Wrecker",
+      },
+      // {
+      //   size: {
+      //     r: "0.50000",
+      //   },
+      //   position: {
+      //     x: "129.4",
+      //     y: "16.4",
+      //   },
+      //   id: "Wave2",
+      //   typeid: "Wrecker",
+      // },
+      {
+        size: {
+          r: "0.50000",
+        },
+        position: {
+          x: num_days * XAXIS_MULTIPLIER - 2,
+          y: max_last_day * YAXIS_MULTIPLIER + 1.0,
+        },
+        id: "Finish",
+        typeid: "Finish",
       },
     ],
   };

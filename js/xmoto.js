@@ -185,7 +185,7 @@
   Constants = (function () {
     function Constants() {}
 
-    Constants.hooking = true;
+    Constants.hooking = false;
 
     Constants.gravity = 9.81;
 
@@ -694,8 +694,12 @@
 
     Level.prototype.update_date = function () {
       // Set the date widget to be a reference to your X coordinate
-      var new_date = new Date("1/22/20");
+      var new_date = new Date(FIRST_DATA_DATE);
       var days = this.moto.body.m_xf.position.x / XAXIS_MULTIPLIER;
+      // Helper for logging location
+      // console.log(
+      //   this.moto.body.m_xf.position.x + ", " + this.moto.body.m_xf.position.y
+      // );
       new_date.setDate(new_date.getDate() + days);
       $(this.options.chrono).text(
         new_date.getMonth() +
@@ -889,8 +893,6 @@
         height: 600,
         replays: [],
         zoom: Constants.default_scale.x,
-        levels_path: "data/Levels",
-        replays_path: "data/Replays",
       };
       options = $.extend(defaults, options);
       Constants.default_scale = {
@@ -1686,7 +1688,7 @@
       results = [];
       for (j = 0, len = ref.length; j < len; j++) {
         entity = ref[j];
-        if (entity.type_id === "EndOfLevel") {
+        if (entity.type_id === "Finish") {
           this.create_entity(entity, "Finish");
           results.push((this.end_of_level = entity));
         } else if (entity.type_id === "Coin") {
@@ -1802,9 +1804,11 @@
     Entities.prototype.entity_texture_name = function (entity) {
       if (entity.type_id === "Sprite") {
         return entity.params.name;
-      } else if (entity.type_id === "EndOfLevel") {
-        return "Finish";
-      } else if (entity.type_id === "Coin" || entity.type_id === "Wrecker") {
+      } else if (
+        entity.type_id === "Finish" ||
+        entity.type_id === "Coin" ||
+        entity.type_id === "Wrecker"
+      ) {
         return entity.type_id;
       }
     };
@@ -3486,7 +3490,7 @@
         item = ref[j];
         items.push({
           id: item,
-          src: "data/Textures/Textures/" + item.toLowerCase(),
+          src: "data/Textures/" + item.toLowerCase(),
         });
       }
       ref1 = this.anims;
@@ -3494,7 +3498,7 @@
         item = ref1[k];
         items.push({
           id: item,
-          src: "data/Textures/Anims/" + item.toLowerCase(),
+          src: "data/Anims/" + item.toLowerCase(),
         });
       }
       ref2 = this.effects;
@@ -3502,7 +3506,7 @@
         item = ref2[l];
         items.push({
           id: item,
-          src: "data/Textures/Effects/" + item.toLowerCase(),
+          src: "data/Effects/" + item.toLowerCase(),
         });
       }
       ref3 = this.moto;
@@ -3510,7 +3514,7 @@
         item = ref3[m];
         items.push({
           id: item,
-          src: "data/Textures/Riders/" + item.toLowerCase() + ".png",
+          src: "data/Riders/" + item.toLowerCase() + ".png",
         });
       }
       ref4 = this.remove_duplicate_textures(items);
