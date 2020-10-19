@@ -113,6 +113,17 @@ initial_level_json = function (num_days, max_height) {
         id: "MyPlayerStart0",
         typeid: "PlayerStart",
       },
+      {
+        size: {
+          r: "0.50000",
+        },
+        position: {
+          x: "18.0",
+          y: "1.0",
+        },
+        id: "MyEndOfLevel0",
+        typeid: "EndOfLevel",
+      },
     ],
   };
 };

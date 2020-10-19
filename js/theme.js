@@ -14,12 +14,12 @@ var THEME_JSON = {
     {
       type: "BikerPart",
       name: "PlayerBikerFront",
-      file: "Front1.png",
+      file: "playerfront.png",
     },
     {
       type: "BikerPart",
       name: "PlayerBikerRear",
-      file: "Rear1.png",
+      file: "playerrear.png",
     },
     {
       type: "BikerPart",
@@ -50,6 +50,56 @@ var THEME_JSON = {
       type: "BikerPart",
       name: "PlayerUpperLeg",
       file: "PlayerUpperLeg.png",
+    },
+    {
+      type: "BikerPart",
+      name: "GhostTorso",
+      file: "ghosttorso.png",
+    },
+    {
+      type: "BikerPart",
+      name: "GhostBikerBody",
+      file: "ghostbikerbody.png",
+    },
+    {
+      type: "BikerPart",
+      name: "GhostBikerFront",
+      file: "ghostbikerfront.png",
+    },
+    {
+      type: "BikerPart",
+      name: "GhostBikerRear",
+      file: "ghostrear.png",
+    },
+    {
+      type: "BikerPart",
+      name: "GhostBikerWheel",
+      file: "ghostbikerwheel.png",
+    },
+    {
+      type: "BikerPart",
+      name: "GhostLowerArm",
+      file: "ghostlowerarm.png",
+    },
+    {
+      type: "BikerPart",
+      name: "GhostLowerLeg",
+      file: "ghostlowerleg.png",
+    },
+    {
+      type: "BikerPart",
+      name: "GhostTorso",
+      file: "ghosttorso.png",
+    },
+    {
+      type: "BikerPart",
+      name: "GhostUpperArm",
+      file: "ghostupperarm.png",
+    },
+    {
+      type: "BikerPart",
+      name: "GhostUpperLeg",
+      file: "ghostupperleg.png",
     },
     {
       type: "EdgeEffect",
