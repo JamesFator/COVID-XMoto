@@ -189,7 +189,7 @@
 
     Constants.air_density = 0.02;
 
-    Constants.moto_acceleration = 9.0;
+    Constants.moto_acceleration = 10.0;
 
     Constants.biker_force = 11.0;
 
@@ -654,7 +654,6 @@
       this.input.init();
       this.camera.init();
       this.listeners.init();
-      return this.init_timer();
     };
 
     Level.prototype.update = function () {
@@ -662,7 +661,7 @@
       this.physics.update();
       dead_player = !this.moto.dead;
       if (dead_player) {
-        this.update_timer();
+        this.update_date();
       }
       this.sky.update();
       this.limits.update();
@@ -672,33 +671,19 @@
       this.moto.update();
     };
 
-    Level.prototype.init_timer = function () {
-      this.start_time = new Date().getTime();
-      return (this.current_time = 0);
-    };
-
-    Level.prototype.update_timer = function (update_now) {
-      var cents, minutes, new_time, seconds;
-      if (update_now == null) {
-        update_now = false;
-      }
-      new_time = new Date().getTime() - this.start_time;
-      if (
-        update_now ||
-        Math.floor(new_time / 10) > Math.floor(this.current_time / 10)
-      ) {
-        minutes = Math.floor(new_time / 1000 / 60);
-        seconds = Math.floor(new_time / 1000) % 60;
-        if (seconds < 10) {
-          seconds = "0" + seconds;
-        }
-        cents = Math.floor(new_time / 10) % 100;
-        if (cents < 10) {
-          cents = "0" + cents;
-        }
-        $(this.options.chrono).text(minutes + ":" + seconds + ":" + cents);
-      }
-      return (this.current_time = new_time);
+    Level.prototype.update_date = function () {
+      // Set the date widget to be a reference to your X coordinate
+      var new_date = new Date("1/22/20");
+      var days = this.moto.body.m_xf.position.x / XAXIS_MULTIPLIER;
+      new_date.setDate(new_date.getDate() + days);
+      $(this.options.chrono).text(
+        new_date.getMonth() +
+          1 +
+          "/" +
+          new_date.getDate() +
+          "/" +
+          new_date.getFullYear()
+      );
     };
 
     Level.prototype.got_coins = function () {
@@ -729,8 +714,7 @@
       this.moto = new Moto(this);
       this.moto.init();
       this.respawn_coins();
-      this.init_timer();
-      return this.update_timer(true);
+      return this.update_date(true);
     };
 
     return Level;

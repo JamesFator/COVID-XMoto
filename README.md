@@ -21,5 +21,4 @@ $ open index.html
 
 1. Add Coronavirus balls?
 2. Update rider to look like doctor
-3. Instead of timer, show the day based on your x coordinate
-4. Reintroduce ghosts
+3. Reintroduce ghosts
