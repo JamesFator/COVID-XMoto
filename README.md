@@ -6,6 +6,8 @@ Pull the most recent JHU CSSE COVID-19 Data and runs a heavily modified version 
 
 COVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University.
 
+Flags provided by [countryflags.com](https://www.countryflags.com/).
+
 ## Running locally
 
 ```bash
@@ -17,8 +19,7 @@ $ open index.html
 
 ## TODO
 
-1. Incoporate [COVID-19 data](https://github.com/CSSEGISandData/COVID-19/blob/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv)
-2. Generate map based on data
-3. Replace textures with [country flags](https://www.countryflags.io/)
-4. Add Coronavirus balls
-5. Update rider to look like doctor
+1. Add Coronavirus balls?
+2. Update rider to look like doctor
+3. Instead of timer, show the day based on your x coordinate
+4. Reintroduce ghosts
