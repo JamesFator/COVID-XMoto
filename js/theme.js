@@ -111,10 +111,10 @@ var THEME_JSON = {
     {
       type: "Entity",
       name: "Finish",
-      fileBase: "checkball_",
+      fileBase: "covid_cure_",
       fileExtension: "png",
       delay: "0.05",
-      frames: 5,
+      frames: 1,
     },
     {
       type: "Entity",
@@ -130,13 +130,13 @@ var THEME_JSON = {
     {
       type: "Entity",
       name: "Wrecker",
-      fileBase: "deathstar_",
+      fileBase: "covid_ball_",
       fileExtension: "png",
       width: "0.95",
       height: "0.95",
       centerX: "0.49",
       delay: "0.045",
-      frames: 24,
+      frames: 1,
     },
     {
       type: "Texture",
