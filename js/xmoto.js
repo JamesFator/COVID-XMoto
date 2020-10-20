@@ -683,7 +683,6 @@
       if (!this.moto.dead) {
         this.update_date();
       }
-      this.sky.update();
       this.limits.update();
       this.entities.update();
       this.camera.update();
@@ -697,9 +696,9 @@
       var new_date = new Date(FIRST_DATA_DATE);
       var days = this.moto.body.m_xf.position.x / XAXIS_MULTIPLIER;
       // Helper for logging location
-      console.log(
-        this.moto.body.m_xf.position.x + ", " + this.moto.body.m_xf.position.y
-      );
+      // console.log(
+      //   this.moto.body.m_xf.position.x + ", " + this.moto.body.m_xf.position.y
+      // );
       new_date.setDate(new_date.getDate() + days);
       $(this.options.chrono).text(
         new_date.getMonth() +
@@ -1174,7 +1173,7 @@
           vertices: [],
         };
         if (block.usetexture.id === "default") {
-          block.usetexture.id = "dirt";
+          block.usetexture.id = "floor";
         }
         block.texture_name = this.theme.texture_params(
           block.usetexture.id
@@ -1895,8 +1894,8 @@
       this.top_wall_aabb = new b2AABB();
       this.top_wall_aabb.lowerBound.Set(this.player.left, this.player.top);
       this.top_wall_aabb.upperBound.Set(this.player.right, this.screen.top);
-      this.texture = "dirt";
-      this.texture_name = this.theme.texture_params("dirt").file;
+      this.texture = "floor";
+      this.texture_name = this.theme.texture_params("floor").file;
       return this;
     };
 
@@ -2113,27 +2112,12 @@
 
     Sky.prototype.init_sprites = function () {
       var texture;
-      texture = PIXI.Texture.from(this.assets.get_url(this.filename));
-      this.sprite = new PIXI.TilingSprite(
-        texture,
-        this.options.width,
-        this.options.height
-      );
+      this.sprite = new PIXI.Sprite.from(this.assets.get_url(this.filename));
+      this.sprite.width = this.options.width;
+      this.sprite.height = this.options.height;
       this.sprite.position.x = 0;
       this.sprite.position.y = 0;
       return this.level.stage.addChildAt(this.sprite, 0);
-    };
-
-    Sky.prototype.update = function () {
-      var position_factor_x, position_factor_y;
-      this.sprite.tileScale.x = 4;
-      this.sprite.tileScale.y = 4;
-      position_factor_x = 15;
-      position_factor_y = 7;
-      this.sprite.tilePosition.x =
-        -this.level.camera.target().x * position_factor_x;
-      return (this.sprite.tilePosition.y =
-        this.level.camera.target().y * position_factor_y);
     };
 
     return Sky;

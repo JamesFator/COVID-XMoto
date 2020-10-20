@@ -2,11 +2,6 @@ var THEME_JSON = {
   name: "Modern",
   sprites: [
     {
-      type: "Texture",
-      name: "default",
-      file: "dirt.jpg",
-    },
-    {
       type: "BikerPart",
       name: "PlayerBikerBody",
       file: "PlayerBikerBody.png",
@@ -140,13 +135,13 @@ var THEME_JSON = {
     },
     {
       type: "Texture",
-      name: "dirt",
-      file: "dirt.jpg",
+      name: "floor",
+      file: "hospital_floor.png",
     },
     {
       type: "Texture",
       name: "sky",
-      file: "sky.jpg",
+      file: "hospital_bg.png",
     },
     { type: "Texture", flag: true, name: "us", file: "us.png" },
     { type: "Texture", flag: true, name: "india", file: "india.png" },
