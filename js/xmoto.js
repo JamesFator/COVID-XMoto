@@ -697,9 +697,9 @@
       var new_date = new Date(FIRST_DATA_DATE);
       var days = this.moto.body.m_xf.position.x / XAXIS_MULTIPLIER;
       // Helper for logging location
-      // console.log(
-      //   this.moto.body.m_xf.position.x + ", " + this.moto.body.m_xf.position.y
-      // );
+      console.log(
+        this.moto.body.m_xf.position.x + ", " + this.moto.body.m_xf.position.y
+      );
       new_date.setDate(new_date.getDate() + days);
       $(this.options.chrono).text(
         new_date.getMonth() +

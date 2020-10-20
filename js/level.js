@@ -79,7 +79,13 @@ convert_to_new_cases_map = function (country_confirmed_map) {
           new_cases[i + 1] +
           new_cases[i + 2]) /
         4.0;
-      averaged_new_cases.push([mean]);
+      averaged_new_cases.push(mean);
+    }
+    // Add the remaining cases
+    for (var i = new_cases.length - 2; i < new_cases.length; i++) {
+      if (new_cases[i] > 0) {
+        averaged_new_cases.push(new_cases[i]);
+      }
     }
     country_new_cases_map[country] = averaged_new_cases;
   }
@@ -148,24 +154,24 @@ initial_level_json = function (country_new_cases_map) {
         id: "Wave1",
         typeid: "Wrecker",
       },
-      // {
-      //   size: {
-      //     r: "0.50000",
-      //   },
-      //   position: {
-      //     x: "129.4",
-      //     y: "16.4",
-      //   },
-      //   id: "Wave2",
-      //   typeid: "Wrecker",
-      // },
+      {
+        size: {
+          r: "0.50000",
+        },
+        position: {
+          x: "169.1",
+          y: "21.7",
+        },
+        id: "Wave2",
+        typeid: "Wrecker",
+      },
       {
         size: {
           r: "0.50000",
         },
         position: {
           x: num_days * XAXIS_MULTIPLIER - 2,
-          y: max_last_day * YAXIS_MULTIPLIER + 1.0,
+          y: max_last_day * YAXIS_MULTIPLIER + 2.5,
         },
         id: "Finish",
         typeid: "Finish",
@@ -194,10 +200,15 @@ add_block_for_country = function (level_json, country_new_cases_map, country) {
     ],
   };
   for (var day = 0; day < num_days; day++) {
+    var y_val = counry_timeseries[day] * YAXIS_MULTIPLIER;
+    // Do some _slight_ modifications where it gets too hard.
+    if (country === "india" && day === 213) {
+      y_val += 1;
+    }
     // Add a vertex based on that day's data
     block.vertices.push({
       x: (day + 1) * XAXIS_MULTIPLIER,
-      y: counry_timeseries[day] * YAXIS_MULTIPLIER,
+      y: y_val,
       // edge: "darken",
     });
   }
