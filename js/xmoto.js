@@ -838,7 +838,6 @@
       if (moto.ghost) {
         return (moto.dead = true);
       } else {
-        console.log("WIN!");
         this.level.replay.success = true;
         return (this.level.need_to_restart = true);
       }

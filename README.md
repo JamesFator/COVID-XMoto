@@ -21,6 +21,4 @@ $ open index.html
 
 ## TODO
 
-1. Add toilet paper collectables
-2. Insert COVID death balls programatically
-3. Order country blocks better
+1. Insert COVID death balls programatically

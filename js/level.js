@@ -3,6 +3,8 @@ CONFIRMED_URL =
 XAXIS_MULTIPLIER = 0.7;
 YAXIS_MULTIPLIER = 0.00025;
 
+COIN_X_INTERVAL = 60.0;
+
 FIRST_DATA_DATE = "1/22/20";
 
 load_covid_level = function (xmoto_ref, callback) {
@@ -13,10 +15,13 @@ load_covid_level = function (xmoto_ref, callback) {
 
 load_covid_level_helper = function (confirmed_csv, xmoto_ref, callback) {
   var country_confirmed_map = parse_csv_data(confirmed_csv);
-  var country_new_cases_map = convert_to_new_cases_map(country_confirmed_map);
-  var level_json = initial_level_json(country_new_cases_map);
+  var new_cases_data = convert_to_new_cases_map(country_confirmed_map);
+  var country_new_cases_map = new_cases_data[0];
+  var day_max = new_cases_data[1];
+  var level_json = initial_level_json(day_max);
 
-  for (var country of Object.keys(country_confirmed_map)) {
+  for (var n = 0; n < VALID_COUNTRIES.length; n++) {
+    var country = VALID_COUNTRIES[n];
     add_block_for_country(level_json, country_new_cases_map, country);
   }
   console.log(level_json);
@@ -39,16 +44,13 @@ parse_csv_data = function (timeseries_csv) {
     if (!(country in country_timeseries_map)) {
       country_timeseries_map[country] = [];
       for (var j = 4; j < columns.length; j++) {
-        country_timeseries_map[country].push(Math.max(0, parseInt(columns[j])));
+        country_timeseries_map[country].push(0);
       }
-    } else {
-      // Some countries have multiple rows, so append the results
-      for (var j = 4; j < columns.length; j++) {
-        country_timeseries_map[country][j - 4] += Math.max(
-          0,
-          parseFloat(columns[j])
-        );
-      }
+    }
+    // Append the results
+    for (var j = 4; j < columns.length; j++) {
+      var day_val = Math.max(0, parseFloat(columns[j]));
+      country_timeseries_map[country][j - 4] += day_val;
     }
   }
   return country_timeseries_map;
@@ -56,8 +58,7 @@ parse_csv_data = function (timeseries_csv) {
 
 convert_to_new_cases_map = function (country_confirmed_map) {
   var country_new_cases_map = {};
-  for (var n = VALID_COUNTRIES.length - 1; n >= 0; n--) {
-    var country = VALID_COUNTRIES[n];
+  for (var country of Object.keys(country_confirmed_map)) {
     country_new_cases_map[country] = [];
     var prev = 0;
     for (var day = 0; day < country_confirmed_map[country].length; day++) {
@@ -69,6 +70,9 @@ convert_to_new_cases_map = function (country_confirmed_map) {
   }
   // Perform a moving average to smooth out the mountain.
   // Otherwise it would be unplayable.
+  var days_max = new Array(
+    country_new_cases_map[Object.keys(country_new_cases_map)[0]].length
+  ).fill(0);
   for (var country of Object.keys(country_new_cases_map)) {
     var new_cases = country_new_cases_map[country];
     var averaged_new_cases = [];
@@ -80,38 +84,29 @@ convert_to_new_cases_map = function (country_confirmed_map) {
           new_cases[i + 2]) /
         4.0;
       averaged_new_cases.push(mean);
+      // Update the day_max if necessary
+      days_max[i] = Math.max(days_max[i], mean);
     }
     // Add the remaining cases
     for (var i = new_cases.length - 2; i < new_cases.length; i++) {
       if (new_cases[i] > 0) {
         averaged_new_cases.push(new_cases[i]);
+        // Update the day_max if necessary
+        days_max[i] = Math.max(days_max[i], new_cases[i]);
       }
     }
     country_new_cases_map[country] = averaged_new_cases;
   }
-  return country_new_cases_map;
+  return [country_new_cases_map, days_max];
 };
 
-initial_level_json = function (country_new_cases_map) {
-  var num_days =
-    country_new_cases_map[Object.keys(country_new_cases_map)[0]].length;
+initial_level_json = function (day_max) {
+  var num_days = day_max.length;
   // Determine the highest point so we can set our top bound
   // also determine our largest final point so we can set our Finish
-  var max_height = 0.0;
-  var max_last_day = 0.0;
-  for (var country of Object.keys(country_new_cases_map)) {
-    var country_timeseries = country_new_cases_map[country];
-    var local_max = Math.max.apply(null, country_timeseries);
-    if (local_max > max_height) {
-      max_height = local_max;
-    }
-
-    var last_day = country_timeseries[num_days - 1];
-    if (last_day > max_last_day) {
-      max_last_day = last_day;
-    }
-  }
-  return {
+  var max_height = Math.max.apply(null, day_max);
+  var max_last_day = day_max[day_max.length - 1];
+  level_json = {
     sky: "sky",
     limits: {
       left: "-1.0",
@@ -178,6 +173,24 @@ initial_level_json = function (country_new_cases_map) {
       },
     ],
   };
+  for (
+    var i = COIN_X_INTERVAL;
+    i < num_days - COIN_X_INTERVAL;
+    i += COIN_X_INTERVAL
+  ) {
+    level_json.entities.push({
+      size: {
+        r: "0.50000",
+      },
+      position: {
+        x: i * XAXIS_MULTIPLIER,
+        y: day_max[i] * YAXIS_MULTIPLIER + 2.0,
+      },
+      id: "Coin" + i,
+      typeid: "Coin",
+    });
+  }
+  return level_json;
 };
 
 add_block_for_country = function (level_json, country_new_cases_map, country) {
