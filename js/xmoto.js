@@ -199,6 +199,9 @@
 
     Constants.fps = 60.0;
 
+    Constants.linear_gravity_force_per_frame =
+      (1 / Constants.fps) * Constants.gravity;
+
     Constants.replay_key_step = 60;
 
     Constants.replay_key_step_precision = 4;
@@ -1677,61 +1680,44 @@
 
     Entities.prototype.init = function () {
       this.init_physics_parts();
-      return this.init_sprites();
+      this.init_sprites();
     };
 
     Entities.prototype.init_physics_parts = function () {
-      var entity, j, len, ref, results;
-      ref = this.list;
-      results = [];
-      for (j = 0, len = ref.length; j < len; j++) {
-        entity = ref[j];
+      var entity, j, len, results;
+      for (j = 0, len = this.list.length; j < len; j++) {
+        entity = this.list[j];
         if (entity.type_id === "Finish") {
-          this.create_entity(entity, "Finish");
-          results.push((this.end_of_level = entity));
+          entity.body = this.create_entity(entity, "Finish");
+          this.end_of_level = entity;
         } else if (entity.type_id === "Coin") {
-          this.create_entity(entity, "coin");
-          results.push(this.coins.push(entity));
+          entity.body = this.create_entity(entity, "coin");
+          this.coins.push(entity);
         } else if (entity.type_id === "Wrecker") {
-          this.create_entity(entity, "wrecker");
-          results.push(this.wreckers.push(entity));
+          entity.body = this.create_entity(entity, "wrecker");
+          this.wreckers.push(entity);
         } else if (entity.type_id === "PlayerStart") {
-          results.push(
-            (this.player_start = {
-              x: entity.position.x,
-              y: entity.position.y,
-            })
-          );
-        } else {
-          results.push(void 0);
+          this.player_start = {
+            x: entity.position.x,
+            y: entity.position.y,
+          };
         }
       }
-      return results;
     };
 
     Entities.prototype.init_sprites = function () {
       var entity, j, len, ref, results;
       ref = this.list;
-      results = [];
       for (j = 0, len = ref.length; j < len; j++) {
         entity = ref[j];
         if (entity.z < 0) {
-          results.push(
-            this.init_entity(entity, this.level.camera.negative_z_container)
-          );
+          this.init_entity(entity, this.level.camera.negative_z_container);
         } else if (entity.z > 0) {
-          results.push(
-            this.init_entity(entity, this.level.camera.positive_z_container)
-          );
+          this.init_entity(entity, this.level.camera.positive_z_container);
         } else if (entity.z === 0) {
-          results.push(
-            this.init_entity(entity, this.level.camera.neutral_z_container)
-          );
-        } else {
-          results.push(void 0);
+          this.init_entity(entity, this.level.camera.neutral_z_container);
         }
       }
-      return results;
     };
 
     Entities.prototype.init_entity = function (entity, container) {
@@ -1778,25 +1764,56 @@
         name: name,
         entity: entity,
       };
-      bodyDef.type = b2Body.b2_staticBody;
+      if (name === "wrecker") {
+        bodyDef.type = b2Body.b2_dynamicBody;
+      } else {
+        bodyDef.type = b2Body.b2_staticBody;
+      }
       body = this.world.CreateBody(bodyDef);
       body.CreateFixture(fixDef);
       return body;
     };
 
     Entities.prototype.update = function (entity) {
-      var j, len, ref, results;
-      ref = this.list;
+      var j, len, results;
       results = [];
-      for (j = 0, len = ref.length; j < len; j++) {
-        entity = ref[j];
+      for (j = 0, len = this.list.length; j < len; j++) {
+        entity = this.list[j];
         if (entity.sprite) {
           results.push((entity.sprite.visible = this.visible(entity)));
         } else {
           results.push(void 0);
         }
       }
+      this.seek_wreckers();
       return results;
+    };
+
+    Entities.prototype.seek_wreckers = function () {
+      var wrecker_speed = 1.5;
+      for (var i = 0; i < this.wreckers.length; i++) {
+        entity = this.wreckers[i];
+        var desired_pos = this.level.moto.body.m_xf.position;
+        var x_diff = desired_pos.x - entity.body.m_xf.position.x;
+        var y_diff = desired_pos.y - entity.body.m_xf.position.y;
+        var diff_tolerance = 0.2;
+        var new_x = 0.0;
+        var new_y = Constants.linear_gravity_force_per_frame;
+        if (x_diff > diff_tolerance) {
+          new_x += wrecker_speed;
+        } else if (x_diff < -diff_tolerance) {
+          new_x -= wrecker_speed;
+        }
+
+        if (y_diff > diff_tolerance) {
+          new_y += wrecker_speed;
+        } else if (y_diff < -diff_tolerance) {
+          new_y -= wrecker_speed;
+        }
+        entity.body.SetLinearVelocity(new b2Vec2(new_x, new_y));
+        entity.sprite.x = entity.body.m_xf.position.x;
+        entity.sprite.y = -entity.body.m_xf.position.y;
+      }
     };
 
     Entities.prototype.entity_texture_name = function (entity) {
@@ -1828,7 +1845,7 @@
     };
 
     Entities.prototype.visible = function (entity) {
-      return entity.aabb.TestOverlap(this.level.camera.aabb) && entity.display;
+      return entity.display;
     };
 
     Entities.prototype.frame_name = function (entity, frame_number) {

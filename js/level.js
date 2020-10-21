@@ -109,7 +109,7 @@ initial_level_json = function (day_max) {
   level_json = {
     sky: "sky",
     limits: {
-      left: "-1.0",
+      left: "-10.0",
       right: num_days * XAXIS_MULTIPLIER - 1,
       top: max_height + 2.0,
       bottom: "0.0",
@@ -132,32 +132,10 @@ initial_level_json = function (day_max) {
           r: "0.50000",
         },
         position: {
-          x: "17.0",
-          y: "1.5",
+          x: "-9.0",
+          y: "0.0",
         },
         id: "Outbreak",
-        typeid: "Wrecker",
-      },
-      {
-        size: {
-          r: "0.50000",
-        },
-        position: {
-          x: "56.0",
-          y: "9.0",
-        },
-        id: "Wave1",
-        typeid: "Wrecker",
-      },
-      {
-        size: {
-          r: "0.50000",
-        },
-        position: {
-          x: "169.1",
-          y: "21.7",
-        },
-        id: "Wave2",
         typeid: "Wrecker",
       },
       {
