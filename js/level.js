@@ -133,7 +133,7 @@ initial_level_json = function (day_max) {
         },
         position: {
           x: "-9.0",
-          y: "0.0",
+          y: "1.0",
         },
         id: "Outbreak",
         typeid: "Wrecker",

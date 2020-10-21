@@ -726,14 +726,9 @@
     };
 
     Level.prototype.respawn_coins = function () {
-      var entity, j, len, ref, results;
-      ref = this.entities.coins;
-      results = [];
-      for (j = 0, len = ref.length; j < len; j++) {
-        entity = ref[j];
-        results.push((entity.display = true));
+      for (var i = 0; i < this.entities.coins.length; i++) {
+        this.entities.coins[i].display = true;
       }
-      return results;
     };
 
     Level.prototype.restart = function () {
@@ -743,6 +738,7 @@
       this.moto = new Moto(this);
       this.moto.init();
       this.respawn_coins();
+      this.entities.reset_wrecker();
       return this.update_date(true);
     };
 
@@ -1549,7 +1545,7 @@
       this.world = level.physics.world;
       this.list = [];
       this.coins = [];
-      this.wreckers = [];
+      this.wrecker = null;
     }
 
     Entities.prototype.parse = function (level_json) {
@@ -1695,7 +1691,11 @@
           this.coins.push(entity);
         } else if (entity.type_id === "Wrecker") {
           entity.body = this.create_entity(entity, "wrecker");
-          this.wreckers.push(entity);
+          this.wrecker = entity;
+          this.wrecker.start_position = new b2Vec2(
+            this.wrecker.body.m_xf.position.x,
+            this.wrecker.body.m_xf.position.y
+          );
         } else if (entity.type_id === "PlayerStart") {
           this.player_start = {
             x: entity.position.x,
@@ -1706,10 +1706,8 @@
     };
 
     Entities.prototype.init_sprites = function () {
-      var entity, j, len, ref, results;
-      ref = this.list;
-      for (j = 0, len = ref.length; j < len; j++) {
-        entity = ref[j];
+      for (var i = 0; i < this.list.length; i++) {
+        var entity = this.list[i];
         if (entity.z < 0) {
           this.init_entity(entity, this.level.camera.negative_z_container);
         } else if (entity.z > 0) {
@@ -1785,35 +1783,39 @@
           results.push(void 0);
         }
       }
-      this.seek_wreckers();
+      this.update_wrecker();
       return results;
     };
 
-    Entities.prototype.seek_wreckers = function () {
+    Entities.prototype.update_wrecker = function () {
       var wrecker_speed = 1.5;
-      for (var i = 0; i < this.wreckers.length; i++) {
-        entity = this.wreckers[i];
-        var desired_pos = this.level.moto.body.m_xf.position;
-        var x_diff = desired_pos.x - entity.body.m_xf.position.x;
-        var y_diff = desired_pos.y - entity.body.m_xf.position.y;
-        var diff_tolerance = 0.2;
-        var new_x = 0.0;
-        var new_y = Constants.linear_gravity_force_per_frame;
-        if (x_diff > diff_tolerance) {
-          new_x += wrecker_speed;
-        } else if (x_diff < -diff_tolerance) {
-          new_x -= wrecker_speed;
-        }
-
-        if (y_diff > diff_tolerance) {
-          new_y += wrecker_speed;
-        } else if (y_diff < -diff_tolerance) {
-          new_y -= wrecker_speed;
-        }
-        entity.body.SetLinearVelocity(new b2Vec2(new_x, new_y));
-        entity.sprite.x = entity.body.m_xf.position.x;
-        entity.sprite.y = -entity.body.m_xf.position.y;
+      var desired_pos = this.level.moto.body.m_xf.position;
+      var x_diff = desired_pos.x - this.wrecker.body.m_xf.position.x;
+      var y_diff = desired_pos.y - this.wrecker.body.m_xf.position.y;
+      var diff_tolerance = 0.2;
+      var new_x = 0.0;
+      var new_y = Constants.linear_gravity_force_per_frame;
+      if (x_diff > diff_tolerance) {
+        new_x += wrecker_speed;
+      } else if (x_diff < -diff_tolerance) {
+        new_x -= wrecker_speed;
       }
+
+      if (y_diff > diff_tolerance) {
+        new_y += wrecker_speed;
+      } else if (y_diff < -diff_tolerance) {
+        new_y -= wrecker_speed;
+      }
+      this.wrecker.body.SetLinearVelocity(new b2Vec2(new_x, new_y));
+      this.wrecker.sprite.x = this.wrecker.body.m_xf.position.x;
+      this.wrecker.sprite.y = -this.wrecker.body.m_xf.position.y;
+    };
+
+    Entities.prototype.reset_wrecker = function () {
+      this.wrecker.body.SetLinearVelocity(new b2Vec2(0.0, 0.0));
+      this.wrecker.body.SetPosition(this.wrecker.start_position);
+      this.wrecker.sprite.x = this.wrecker.body.m_xf.position.x;
+      this.wrecker.sprite.y = -this.wrecker.body.m_xf.position.y;
     };
 
     Entities.prototype.entity_texture_name = function (entity) {
