@@ -110,7 +110,7 @@ initial_level_json = function (day_max) {
     sky: "sky",
     limits: {
       left: "-10.0",
-      right: num_days * XAXIS_MULTIPLIER - 1,
+      right: num_days * XAXIS_MULTIPLIER - 1.65,
       top: max_height + 2.0,
       bottom: "0.0",
     },
@@ -143,8 +143,8 @@ initial_level_json = function (day_max) {
           r: "0.50000",
         },
         position: {
-          x: num_days * XAXIS_MULTIPLIER - 2,
-          y: max_last_day * YAXIS_MULTIPLIER + 2.5,
+          x: num_days * XAXIS_MULTIPLIER - 2.65,
+          y: max_last_day * YAXIS_MULTIPLIER + 2.0,
         },
         id: "Finish",
         typeid: "Finish",
