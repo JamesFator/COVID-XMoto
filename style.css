@@ -31,6 +31,20 @@ body {
   color: white;
 }
 
+#restart_text {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 19px;
+  position: absolute;
+  top: 430px;
+  left: 390px;
+  text-align: center;
+  padding: 15px;
+  background-color: black;
+  opacity: 0.6;
+  color: white;
+  display: none;
+}
+
 #chrono {
   position: absolute;
   top: 15px;

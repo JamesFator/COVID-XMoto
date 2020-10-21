@@ -732,6 +732,7 @@
     };
 
     Level.prototype.restart = function () {
+      $("#restart_text").hide();
       this.replay = new Replay(this);
       this.ghosts.reload();
       this.moto.destroy();
@@ -844,6 +845,7 @@
 
     Listeners.prototype.kill_moto = function (moto) {
       if (!moto.dead) {
+        $("#restart_text").show();
         moto.dead = true;
         this.world.DestroyJoint(moto.rider.ankle_joint);
         this.world.DestroyJoint(moto.rider.wrist_joint);
