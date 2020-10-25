@@ -1793,10 +1793,27 @@
     };
 
     Entities.prototype.update_wrecker = function () {
+      if (this.level.moto.dead) {
+        return;
+      }
+
+      // For some reason when people leave the window and come back, the
+      // wrecker body is super far away. Detect that and restore position.
+      var a = this.wrecker.sprite.x - this.wrecker.body.m_xf.position.x;
+      var b = this.wrecker.sprite.y - -this.wrecker.body.m_xf.position.y;
+      if (Math.sqrt(a * a + b * b) > 2) {
+        console.log("Anchoring wrecker");
+        this.wrecker.body.SetPosition(
+          new b2Vec2(this.wrecker.sprite.x, -this.wrecker.sprite.y)
+        );
+      }
+
       var wrecker_speed = 3.0;
       var desired_pos = this.level.moto.body.m_xf.position;
       var x_diff = desired_pos.x - this.wrecker.body.m_xf.position.x;
       var y_diff = desired_pos.y - this.wrecker.body.m_xf.position.y;
+      // Allow some tolerance for no movement if wrecker is approximately at
+      // the desired x or y value.
       var diff_tolerance = 0.2;
       var new_x = 0.0;
       var new_y = Constants.linear_gravity_force_per_frame;
@@ -1811,12 +1828,25 @@
       } else if (y_diff < -diff_tolerance) {
         new_y -= wrecker_speed;
       }
+
+      // Set the velocity for where we should be going, and update the sprite
+      // location to where the box2d body is.
       this.wrecker.body.SetLinearVelocity(new b2Vec2(new_x, new_y));
       this.wrecker.sprite.x = this.wrecker.body.m_xf.position.x;
       this.wrecker.sprite.y = -this.wrecker.body.m_xf.position.y;
+      // console.log(
+      //   this.wrecker.sprite.x +
+      //     "," +
+      //     this.wrecker.sprite.y +
+      //     " ====> " +
+      //     desired_pos.x +
+      //     "," +
+      //     desired_pos.y
+      // );
     };
 
     Entities.prototype.reset_wrecker = function () {
+      console.log("wrecker_reset");
       this.wrecker.body.SetLinearVelocity(new b2Vec2(0.0, 0.0));
       this.wrecker.body.SetPosition(this.wrecker.start_position);
       this.wrecker.sprite.x = this.wrecker.body.m_xf.position.x;
