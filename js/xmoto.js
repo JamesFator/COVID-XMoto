@@ -193,9 +193,11 @@
 
     Constants.air_density = 0.02;
 
-    Constants.moto_acceleration = 10.0;
+    // Constants.moto_acceleration = 10.0;
+    Constants.moto_acceleration = 9.0;
 
-    Constants.biker_force = 11.0;
+    // Constants.biker_force = 11.0;
+    Constants.biker_force = 7.0;
 
     Constants.fps = 60.0;
 
@@ -242,7 +244,8 @@
       radius: 0.35,
       density: 1.8,
       restitution: 0.3,
-      friction: 1.4,
+      // friction: 1.4,
+      friction: 20.0,
       position: {
         x: -0.7,
         y: 0.48,
@@ -1790,7 +1793,7 @@
     };
 
     Entities.prototype.update_wrecker = function () {
-      var wrecker_speed = 1.5;
+      var wrecker_speed = 3.0;
       var desired_pos = this.level.moto.body.m_xf.position;
       var x_diff = desired_pos.x - this.wrecker.body.m_xf.position.x;
       var y_diff = desired_pos.y - this.wrecker.body.m_xf.position.y;

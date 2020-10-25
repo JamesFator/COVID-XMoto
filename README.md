@@ -16,7 +16,7 @@ Flags provided by [countryflags.com](https://www.countryflags.com/).
 # Start Chrome up to allow accessing local files
 $ /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --allow-file-access-from-files
 # Open the main page in your browser
-$ open index.html
+$ open covid_xmoto.html
 ```
 
 ## TODO
