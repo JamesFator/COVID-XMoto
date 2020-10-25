@@ -1167,8 +1167,8 @@
         block = {
           id: block_json.id,
           position: {
-            x: parseFloat(block_json.position.x),
-            y: parseFloat(block_json.position.y),
+            x: block_json.position.x,
+            y: block_json.position.y,
           },
           usetexture: {
             id: block_json.usetexture.id.toLowerCase(),
@@ -1184,10 +1184,10 @@
         for (k = 0, len2 = block_json.vertices.length; k < len2; k++) {
           vertex_json = block_json.vertices[k];
           vertex = {
-            x: parseFloat(vertex_json.x),
-            y: parseFloat(vertex_json.y),
-            absolute_x: parseFloat(vertex_json.x) + block.position.x,
-            absolute_y: parseFloat(vertex_json.y) + block.position.y,
+            x: vertex_json.x,
+            y: vertex_json.y,
+            absolute_x: vertex_json.x + block.position.x,
+            absolute_y: vertex_json.y + block.position.y,
             edge: vertex_json.edge ? vertex_json.edge.toLowerCase() : void 0,
           };
           block.vertices.push(vertex);
@@ -1571,15 +1571,15 @@
           id: entity_json.id,
           type_id: entity_json.typeid,
           size: {
-            r: parseFloat(entity_json.size.r),
-            z: parseInt(entity_json.size.z) || void 0,
-            width: parseFloat(entity_json.size.width),
-            height: parseFloat(entity_json.size.height),
+            r: entity_json.size.r,
+            z: entity_json.size.z || void 0,
+            width: entity_json.size.width,
+            height: entity_json.size.height,
           },
           position: {
-            x: parseFloat(entity_json.position.x),
-            y: parseFloat(entity_json.position.y),
-            angle: parseFloat(entity_json.position.angle) || 0,
+            x: entity_json.position.x,
+            y: entity_json.position.y,
+            angle: entity_json.position.angle || 0,
           },
           params: {},
         };
@@ -1591,7 +1591,7 @@
             entity.params[name] = value;
           }
         }
-        entity["z"] = entity.size.z || parseInt(entity.params.z) || 0;
+        entity["z"] = entity.size.z || entity.params.z || 0;
         texture_name = this.entity_texture_name(entity);
         if (texture_name) {
           sprite = this.assets.theme.sprite_params(texture_name);
@@ -1915,16 +1915,16 @@
 
     Limits.prototype.parse = function (level_json) {
       this.player = {
-        left: parseFloat(level_json.limits.left),
-        right: parseFloat(level_json.limits.right),
-        top: parseFloat(level_json.limits.top),
-        bottom: parseFloat(level_json.limits.bottom),
+        left: level_json.limits.left,
+        right: level_json.limits.right,
+        top: level_json.limits.top,
+        bottom: level_json.limits.bottom,
       };
       this.screen = {
-        left: parseFloat(level_json.limits.left) - 20,
-        right: parseFloat(level_json.limits.right) + 20,
-        top: parseFloat(level_json.limits.top) + 20,
-        bottom: parseFloat(level_json.limits.bottom) - 20,
+        left: level_json.limits.left - 20,
+        right: level_json.limits.right + 20,
+        top: level_json.limits.top + 20,
+        bottom: level_json.limits.bottom - 20,
       };
       this.size = {
         x: this.screen.right - this.screen.left,
@@ -3689,28 +3689,28 @@
             file_base: sprite.fileBase,
             file_ext: sprite.fileExtension,
             size: {
-              width: parseFloat(sprite.width),
-              height: parseFloat(sprite.height),
+              width: sprite.width,
+              height: sprite.height,
             },
             center: {
-              x: parseFloat(sprite.centerX),
-              y: parseFloat(sprite.centerY),
+              x: sprite.centerX,
+              y: sprite.centerY,
             },
             frames: sprite.frames,
-            delay: parseFloat(sprite.delay),
+            delay: sprite.delay,
           };
         } else if (sprite.type === "EdgeEffect") {
           this.edges[sprite.name.toLowerCase()] = {
             file: sprite.file.toLowerCase(),
-            scale: parseFloat(sprite.scale),
-            depth: parseFloat(sprite.depth),
+            scale: sprite.scale,
+            depth: sprite.depth,
           };
         } else if (sprite.type === "Texture") {
           this.textures[sprite.name.toLowerCase()] = {
             file: sprite.file ? sprite.file.toLowerCase() : "",
             file_base: sprite.fileBase,
             file_ext: sprite.fileExtension,
-            delay: parseFloat(sprite.delay),
+            delay: sprite.delay,
           };
         }
       }

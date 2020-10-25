@@ -109,38 +109,38 @@ initial_level_json = function (day_max) {
   level_json = {
     sky: "sky",
     limits: {
-      left: "-10.0",
+      left: -10.0,
       right: num_days * XAXIS_MULTIPLIER - 1.65,
       top: max_height + 2.0,
-      bottom: "0.0",
+      bottom: 0.0,
     },
     blocks: [],
     entities: [
       {
         size: {
-          r: "0.400000",
+          r: 0.4,
         },
         position: {
-          x: "0.0",
-          y: "1.0",
+          x: 0.0,
+          y: 1.0,
         },
         id: "MyPlayerStart0",
         typeid: "PlayerStart",
       },
       {
         size: {
-          r: "0.50000",
+          r: 0.5,
         },
         position: {
-          x: "-9.0",
-          y: "1.0",
+          x: -9.0,
+          y: 1.0,
         },
         id: "Outbreak",
         typeid: "Wrecker",
       },
       {
         size: {
-          r: "0.50000",
+          r: 0.5,
         },
         position: {
           x: num_days * XAXIS_MULTIPLIER - 2.65,
@@ -158,7 +158,7 @@ initial_level_json = function (day_max) {
   ) {
     level_json.entities.push({
       size: {
-        r: "0.50000",
+        r: 0.5,
       },
       position: {
         x: i * XAXIS_MULTIPLIER,
