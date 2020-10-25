@@ -1793,10 +1793,6 @@
     };
 
     Entities.prototype.update_wrecker = function () {
-      if (this.level.moto.dead) {
-        return;
-      }
-
       // For some reason when people leave the window and come back, the
       // wrecker body is super far away. Detect that and restore position.
       var a = this.wrecker.sprite.x - this.wrecker.body.m_xf.position.x;
@@ -1833,9 +1829,13 @@
         new_y -= wrecker_speed;
       }
 
-      // Set the velocity for where we should be going, and update the sprite
-      // location to where the box2d body is.
-      this.wrecker.body.SetLinearVelocity(new b2Vec2(new_x, new_y));
+      // Hacky way to avoid the wrecker from not moving because this introduced
+      // a bug where the wrecker would not move on restart. This also gives us
+      // a fun animation of the wrecker moving around when we die :D
+      if (new_x != 0) {
+        this.wrecker.body.SetLinearVelocity(new b2Vec2(new_x, new_y));
+      }
+      // Update the sprite location to where the box2d body is.
       this.wrecker.sprite.x = this.wrecker.body.m_xf.position.x;
       this.wrecker.sprite.y = -this.wrecker.body.m_xf.position.y;
       // console.log(
