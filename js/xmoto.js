@@ -1809,6 +1809,10 @@
       }
 
       var wrecker_speed = 3.0;
+      if (this.level.ghosts.player.replay) {
+        // Speed up wrecker if the player has already beat the level
+        wrecker_speed = 3.7;
+      }
       var desired_pos = this.level.moto.body.m_xf.position;
       var x_diff = desired_pos.x - this.wrecker.body.m_xf.position.x;
       var y_diff = desired_pos.y - this.wrecker.body.m_xf.position.y;

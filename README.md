@@ -18,7 +18,3 @@ $ /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --allow-file-ac
 # Open the main page in your browser
 $ open covid_xmoto.html
 ```
-
-## TODO
-
-1. Insert COVID death balls programatically
