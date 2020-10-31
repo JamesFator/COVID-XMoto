@@ -20,6 +20,7 @@
     Rider,
     Sky,
     Theme,
+    OpenAIClient,
     b2AABB,
     b2Body,
     b2BodyDef,
@@ -94,13 +95,11 @@
     };
 
     Camera.prototype.target = function () {
-      var adjusted_position, options, position;
-      options = this.level.options;
-      position = this.active_object().GetPosition();
-      return (adjusted_position = {
+      var position = this.active_object().GetPosition();
+      return {
         x: position.x + this.translate.x,
         y: position.y + this.translate.y + 0.25,
-      });
+      };
     };
 
     Camera.prototype.init_scroll = function () {
@@ -572,32 +571,35 @@
       return (document.onkeydown = keydown);
     };
 
+    Input.prototype.toggle_key = function (key_code, is_down) {
+      switch (key_code) {
+        case 38:
+          return (this.up = is_down);
+        case 40:
+          return (this.down = is_down);
+        case 37:
+          return (this.left = is_down);
+        case 39:
+          return (this.right = is_down);
+        case 32:
+          return (this.space = is_down);
+        case 13:
+          return (this.level.need_to_restart = is_down);
+        case 69:
+          if (is_down && !$("input").is(":focus")) {
+            return this.level.moto.rider.eject();
+          }
+          break;
+      }
+    };
+
     Input.prototype.init_keyboard = function () {
       $(document).off("keydown");
       $(document).on(
         "keydown",
         (function (_this) {
           return function (event) {
-            var url;
-            switch (event.which || event.keyCode) {
-              case 38:
-                return (_this.up = true);
-              case 40:
-                return (_this.down = true);
-              case 37:
-                return (_this.left = true);
-              case 39:
-                return (_this.right = true);
-              case 32:
-                return (_this.space = true);
-              case 13:
-                return (_this.level.need_to_restart = true);
-              case 69:
-                if (!$("input").is(":focus")) {
-                  return _this.level.moto.rider.eject();
-                }
-                break;
-            }
+            _this.toggle_key(event.which || event.keyCode, true);
           };
         })(this)
       );
@@ -605,16 +607,7 @@
         "keyup",
         (function (_this) {
           return function (event) {
-            switch (event.which || event.keyCode) {
-              case 38:
-                return (_this.up = false);
-              case 40:
-                return (_this.down = false);
-              case 37:
-                return (_this.left = false);
-              case 39:
-                return (_this.right = false);
-            }
+            _this.toggle_key(event.which || event.keyCode, false);
           };
         })(this)
       );
@@ -644,6 +637,7 @@
       this.entities = new Entities(this);
       this.replay = new Replay(this);
       this.ghosts = new Ghosts(this);
+      this.openai_client = new OpenAIClient(this);
     }
 
     Level.prototype.load_data = function (callback) {
@@ -695,6 +689,7 @@
       this.blocks.update();
       this.moto.update();
       this.ghosts.update();
+      this.openai_client.update();
     };
 
     Level.prototype.update_date = function () {
@@ -3729,5 +3724,51 @@
     };
 
     return Theme;
+  })();
+
+  OpenAIClient = (function () {
+    function OpenAIClient(level) {
+      this.level = level;
+      this.socket = null;
+      this.server_payload = "";
+      this.establish_connection();
+    }
+
+    OpenAIClient.prototype.establish_connection = function () {
+      // Attempt to connect to server
+      this.socket = new WebSocket("ws://localhost:8675");
+      var _this = this;
+
+      this.socket.onmessage = function (event) {
+        console.log("RECEIVED DATA: " + event.data);
+        _this.server_payload = event.data;
+      };
+    };
+
+    OpenAIClient.prototype.update = function () {
+      if (this.socket === null || this.socket.readyState !== this.socket.OPEN) {
+        // No server to talk to. Continue in client only mode.
+        return;
+      }
+
+      var action_data = JSON.parse(this.server_payload);
+
+      // Iterate over all the keys and send them as input
+      for (var key_code of Object.keys(action_data)) {
+        this.level.input.toggle_key(key_code, action_data[key_code]);
+      }
+
+      // Respond with the current state
+      var game_state = {
+        // Your score is how far you make it in the level
+        "score": this.level.moto.body.m_xf.position.x,
+        "dead": this.level.moto.dead,
+        // TODO: This just responds if we've won in the past
+        "win": this.level.ghosts.player.replay,
+      };
+      this.socket.send(JSON.stringify(game_state));
+    };
+
+    return OpenAIClient;
   })();
 }.call(this));
