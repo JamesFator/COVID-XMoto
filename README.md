@@ -18,13 +18,3 @@ $ /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --allow-file-ac
 # Open the main page in your browser
 $ open covid_xmoto.html
 ```
-
-# OpenAI
-
-## Setup
-
-```bash
-$ pip3 install websockets
-$ pip3 install gym
-$ pip3 install tensorflow
-```
