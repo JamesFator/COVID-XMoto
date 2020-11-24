@@ -3523,7 +3523,7 @@
         item = ref[j];
         items.push({
           id: item,
-          src: "data/Textures/" + item.toLowerCase(),
+          src: "textures/" + item.toLowerCase(),
         });
       }
       ref1 = this.anims;
@@ -3531,7 +3531,7 @@
         item = ref1[k];
         items.push({
           id: item,
-          src: "data/Anims/" + item.toLowerCase(),
+          src: "anims/" + item.toLowerCase(),
         });
       }
       ref2 = this.effects;
@@ -3539,7 +3539,7 @@
         item = ref2[l];
         items.push({
           id: item,
-          src: "data/Effects/" + item.toLowerCase(),
+          src: "effects/" + item.toLowerCase(),
         });
       }
       ref3 = this.moto;
@@ -3547,7 +3547,7 @@
         item = ref3[m];
         items.push({
           id: item,
-          src: "data/Riders/" + item.toLowerCase() + ".png",
+          src: "riders/" + item.toLowerCase() + ".png",
         });
       }
       ref4 = this.remove_duplicate_textures(items);
