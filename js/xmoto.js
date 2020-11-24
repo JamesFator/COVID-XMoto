@@ -20,7 +20,6 @@
     Rider,
     Sky,
     Theme,
-    OpenAIClient,
     b2AABB,
     b2Body,
     b2BodyDef,
@@ -637,7 +636,6 @@
       this.entities = new Entities(this);
       this.replay = new Replay(this);
       this.ghosts = new Ghosts(this);
-      this.openai_client = new OpenAIClient(this);
     }
 
     Level.prototype.load_data = function (callback) {
@@ -689,7 +687,6 @@
       this.blocks.update();
       this.moto.update();
       this.ghosts.update();
-      this.openai_client.update();
     };
 
     Level.prototype.update_date = function () {
@@ -3724,51 +3721,5 @@
     };
 
     return Theme;
-  })();
-
-  OpenAIClient = (function () {
-    function OpenAIClient(level) {
-      this.level = level;
-      this.socket = null;
-      this.server_payload = "";
-      this.establish_connection();
-    }
-
-    OpenAIClient.prototype.establish_connection = function () {
-      // Attempt to connect to server
-      this.socket = new WebSocket("ws://localhost:8675");
-      var _this = this;
-
-      this.socket.onmessage = function (event) {
-        console.log("RECEIVED DATA: " + event.data);
-        _this.server_payload = event.data;
-      };
-    };
-
-    OpenAIClient.prototype.update = function () {
-      if (this.socket === null || this.socket.readyState !== this.socket.OPEN) {
-        // No server to talk to. Continue in client only mode.
-        return;
-      }
-
-      var action_data = JSON.parse(this.server_payload);
-
-      // Iterate over all the keys and send them as input
-      for (var key_code of Object.keys(action_data)) {
-        this.level.input.toggle_key(key_code, action_data[key_code]);
-      }
-
-      // Respond with the current state
-      var game_state = {
-        // Your score is how far you make it in the level
-        "score": this.level.moto.body.m_xf.position.x,
-        "dead": this.level.moto.dead,
-        // TODO: This just responds if we've won in the past
-        "win": this.level.ghosts.player.replay,
-      };
-      this.socket.send(JSON.stringify(game_state));
-    };
-
-    return OpenAIClient;
   })();
 }.call(this));
