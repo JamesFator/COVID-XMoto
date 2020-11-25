@@ -64,7 +64,7 @@
     };
 
     Camera.prototype.active_object = function () {
-      return this.level.moto.body;
+      return this.level.moto.rider.torso;
     };
 
     Camera.prototype.move = function () {
@@ -799,7 +799,7 @@
             ) {
               moto = a.name === "rider" ? a.rider.moto : b.rider.moto;
               return _this.kill_moto(moto);
-            } else if (Listeners.does_contact_moto_rider(a, b, "wrecker")) {
+            } else if (Listeners.does_contact_rider(a, b, "wrecker")) {
               if (a.name === "rider" || b.name === "rider") {
                 moto = a.name === "rider" ? a.rider.moto : b.rider.moto;
               } else {
@@ -818,6 +818,13 @@
       collision =
         Listeners.does_contact(a, b, obj, "rider") ||
         Listeners.does_contact(a, b, obj, "moto");
+      player = a.type === "player" || b.type === "player";
+      return collision && player;
+    };
+
+    Listeners.does_contact_rider = function (a, b, obj) {
+      var collision, player;
+      collision = Listeners.does_contact(a, b, obj, "rider");
       player = a.type === "player" || b.type === "player";
       return collision && player;
     };
@@ -1801,7 +1808,7 @@
         // Speed up wrecker if the player has already beat the level
         wrecker_speed = 3.7;
       }
-      var desired_pos = this.level.moto.body.m_xf.position;
+      var desired_pos = this.level.moto.rider.torso.m_xf.position;
       var x_diff = desired_pos.x - this.wrecker.body.m_xf.position.x;
       var y_diff = desired_pos.y - this.wrecker.body.m_xf.position.y;
       // Allow some tolerance for no movement if wrecker is approximately at
