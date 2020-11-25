@@ -1,5 +1,7 @@
 # COVID XMoto
 
+[Play here!](https://jamesfator.com/covid_xmoto)
+
 The COVID-19 confirmed cases timeseries has become a mountain which you must climb with your motorcycle!
 
 ![Example screenshot](/example/example_1.png)
